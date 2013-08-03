@@ -211,45 +211,6 @@ class FileCreator {
 	 	\cli\out("SUCCESS: File successfully created with final size: " . self::human_readable_size(filesize($output_path)) . "\n");
 	}
 	
-	
-	
-	/**
-	 * detect if a string ends with the supplied $needle
-	 * 
-	 * based on the code identified in the link which is considered to be in the public domain
-	 *
-	 * @link http://stackoverflow.com/a/834355 based on the code at this uri
-	 *
-	 * @since 1.0
-	 * @author techxplorer <corey@techxplorer.com>
-	 *
-	 * @param string $haystack the string to search
-	 * @param string $needle the string to search for
-	 *
-	 * @return boolean true if the $haystack ends with $needle, or false
-	 * 
-	 * @throws \InvalidArgumentException if either of the parameters are null or empty
-	 */
-/*
-	public static function ends_with($haystack, $needle)
-	{
-		// check on the parameters
-		if($haystack == null || trim($haystack) == false) {
-			throw new \InvalidArgumentException("the haystack parameter cannot be null or empty");
-		}
-		
-		if($needle == null || (trim($needle) == false && $needle != "\n")) {
-			throw new \InvalidArgumentException("the needle parameter cannot be null");
-		}
-		
-		$length = strlen($needle);
-		if ($length == 0) {
-			return true;
-		}
-		return (substr($haystack, -$length) === $needle);
-	}
-*/
-	
 	/**
 	 * convert a file size from human readable format to byte count
 	 *
