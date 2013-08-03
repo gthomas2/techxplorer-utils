@@ -21,6 +21,8 @@ The script expects two command line arguments:
 1. --output (-o) the path to the output file
 2. --size (-s) the size of the file in human readable format e.g. 22MB
 
+More information on the script is available on [this blog post](http://thoughtsbytechxplorer.com/thoughts/2013/07/new-utility-file-creator).
+
 ## Dependencies ##
 
 The utility scripts use the following libraries, installed via Composer
