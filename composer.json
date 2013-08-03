@@ -1,0 +1,5 @@
+{
+	"require": {
+        "jlogsdon/cli": "dev-master"
+	}
+}

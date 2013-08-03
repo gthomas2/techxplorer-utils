@@ -1,0 +1,70 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+    ],
+    "hash": "1c27f178f80762ef3a9396a60e246608",
+    "packages": [
+        {
+            "name": "jlogsdon/cli",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jlogsdon/php-cli-tools.git",
+                "reference": "e5d20d447b97a0b9d6a40bcd40307e2173d2e3a0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jlogsdon/php-cli-tools/zipball/e5d20d447b97a0b9d6a40bcd40307e2173d2e3a0",
+                "reference": "e5d20d447b97a0b9d6a40bcd40307e2173d2e3a0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">= 5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "cli": "lib/"
+                },
+                "files": [
+                    "lib/cli/cli.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "James Logsdon",
+                    "email": "jlogsdon@php.net",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Console utilities for PHP",
+            "homepage": "http://github.com/jlogsdon/php-cli-tools",
+            "keywords": [
+                "cli",
+                "console"
+            ],
+            "time": "2013-07-08 21:20:00"
+        }
+    ],
+    "packages-dev": [
+
+    ],
+    "aliases": [
+
+    ],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "jlogsdon/cli": 20
+    },
+    "platform": [
+
+    ],
+    "platform-dev": [
+
+    ]
+}
