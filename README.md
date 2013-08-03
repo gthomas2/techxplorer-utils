@@ -21,7 +21,7 @@ The script expects two command line arguments:
 1. --output (-o) the path to the output file
 2. --size (-s) the size of the file in human readable format e.g. 22MB
 
-## Libraries ##
+## Dependencies ##
 
 The utility scripts use the following libraries, installed via Composer
 
