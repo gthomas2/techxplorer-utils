@@ -23,7 +23,7 @@ The script expects two command line arguments:
 
 More information on the script is available on [this blog post](http://thoughtsbytechxplorer.com/thoughts/2013/07/new-utility-file-creator).
 
-### Moodle User List Creator ###
+### MdlUserListCreator.php ###
 The purpose of this script is to create a randomly generated list of user records that can be uploaded into a [Moodle](https://moodle.org/) website. The data source for names are the top 100 male, female and last name from [this dataset](http://www.census.gov/genealogy/www/data/1990surnames/names_files.html) available from the [US Census Bureau](http://www.census.gov/).
 
 The script expects the following command line arguments
@@ -32,6 +32,8 @@ The script expects the following command line arguments
 2. --number (-n) the number of user records to create
 3. --domain (-d) the domain used to build email addresses
 4. --course (-c) the short code of a course to enrol the new users (optional)
+
+More information on the script is available on [this blog post](http://thoughtsbytechxplorer.com/thoughts/2013/07/new-utility-moodle-user-list-creator).
 
 ## Dependencies ##
 
