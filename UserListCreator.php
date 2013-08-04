@@ -122,6 +122,13 @@ class UserListCreator {
 			)
 		);
 		
+		$arguments->addOption(array('course', 'c'),
+			array (
+				'default' => '',
+				'description' => 'The short code of a course to enrol the users in'
+			)
+		);
+		
 		$arguments->addFlag(array('help', 'h'), 'Show this help screen');
 		
 		// parse the arguments
@@ -168,13 +175,18 @@ class UserListCreator {
 		 	$required_records = (int)$required_records;
 	 	}
 	 	
-	 	// check the arguments
 		if(!$arguments['domain']) {
 			echo $arguments->getHelpScreen();
 			echo "\n\n";
 		 	die(-1);
 		} else {
 			$domain_name = $arguments['domain'];
+		}
+		
+		if(!$arguments['course']) {
+			$course = false;
+		} else {
+			$course = $arguments['course'];
 		}
 	 	
 	 	// check to make sure we can access the data files
@@ -194,7 +206,16 @@ class UserListCreator {
 	 	}
 	 	
 	 	// output some information
-	 	\cli\out("Creating file of $required_records user records with email addresses @ $domain_name to:\n $output_path\n");
+	 	if($course != false){
+		 	\cli\out("Creating file of $required_records user records\n");
+		 	\cli\out("  with email addresses @ $domain_name\n");
+		 	\cli\out("  with course short code: $course\n");
+		 	\cli\out("  to $output_path\n");
+	 	} else {
+		 	\cli\out("Creating file of $required_records user records\n");
+		 	\cli\out("  with email addresses @ $domain_name\n");
+		 	\cli\out("  to $output_path\n");
+	 	}
 	 	
 	 	// read in the data files
 	 	$male_data = $this->get_data(__DIR__ . self::MALE_DATA_PATH);
@@ -245,7 +266,12 @@ class UserListCreator {
 		 	
 		 		$email_address = $user_name . '@' . $domain_name;
 		 		
-			 	$user_records[$user_name] = array($user_name, $this->generate_password(), $first_name , $surname, $email_address);
+		 		if($course != false) {
+			 		$user_records[$user_name] = array($user_name, $this->generate_password(), $first_name , $surname, $email_address, $course);
+		 		} else {
+			 		$user_records[$user_name] = array($user_name, $this->generate_password(), $first_name , $surname, $email_address);
+		 		}
+			 	
 			 	$name_count++;
 		 	}
 	 	}
@@ -260,8 +286,12 @@ class UserListCreator {
 	 	
 	 	// output the file header
 	 	//username,password,firstname,lastname,email
-	 	$result = fwrite($output_handle, "username,password,firstname,lastname,email\n");
-	 	
+	 	if($course != false) {
+		 	$result = fwrite($output_handle, "username,password,firstname,lastname,email,course1\n");
+	 	} else {
+		 	$result = fwrite($output_handle, "username,password,firstname,lastname,email\n");
+	 	}
+	 		 	
 	 	if($result == false) {
 		 	\cli\err("ERROR: unable to write the output file\n");
 		 	die(-1);
@@ -269,7 +299,12 @@ class UserListCreator {
 	 	
 	 	foreach($user_records as $data) {
 	 		
-	 		fputcsv($output_handle, $data);
+	 		$result = fputcsv($output_handle, $data);
+	 		
+	 		if($result == false) {
+		 		\cli\err("ERROR: unable to write the output file\n");
+		 		die(-1);
+	 		}
 		 	
 	 	}
 	 	
@@ -279,6 +314,8 @@ class UserListCreator {
 	 	\cli\out("SUCCESS: File successfully created.\n");
 	}
 	
+	
+	// small private function to make reading in the data files easier
 	private function get_data($path) {
 		$data = file($path, FILE_IGNORE_NEW_LINES);
 	 	
@@ -293,7 +330,7 @@ class UserListCreator {
 	 	}
 	}
 	
-	// function derived from 
+	// function to generate passwords derived from 
 	// https://gist.github.com/tylerhall/521810
 	// and considered to be in the public domain
 	private function generate_password($length = 8, $add_dashes = false, $available_sets = 'luds') {
