@@ -39,10 +39,13 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
  */
  
 /**
- * main driving class of Techxplorer's File Creator
+ * main driving class of Techxplorer's User List Creator
  *
  * @since 1.0
  * @author techxplorer <corey@techxplorer.com>
+ *
+ * @copyright 2013 Corey Wallis (techxplorer)
+ * @license http://opensource.org/licenses/GPL-3.0
  */
 class FileCreator {
 
@@ -59,7 +62,7 @@ class FileCreator {
 	/**
 	 * deines the uri for more information
 	 */
-	const MORE_INFO_URI = 'http://thoughtsbytechxplorer.com';
+	const MORE_INFO_URI = 'https://github.com/techxplorer/techxplorer-utils';
 	
 	/**
 	 * defines the license uri
