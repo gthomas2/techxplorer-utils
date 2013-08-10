@@ -82,6 +82,16 @@ class MdlUserListCreator {
 	const LAST_NAME_DATA_PATH = '/data/last-names.txt';
 	
 	/**
+	 * define the default role definition file
+	 */
+	const DEFAULT_ROLES_FILE = '/data/mdl-roles.json.dist';
+	
+	/**
+	 * define the override role definition file
+	 */
+	const OVERRIDE_ROLES_FILE = '/data/mdl-roles.json';
+	
+	/**
 	 * defines the default number records to create
 	 */
 	const DEFAULT_RECORD_COUNT = 100;
@@ -126,6 +136,13 @@ class MdlUserListCreator {
 			array (
 				'default' => '',
 				'description' => 'The short code of a course to enrol the users in'
+			)
+		);
+		
+		$arguments->addOption(array('roles', 'r'),
+			array(
+				'default' => '',
+				'description' => 'Assign roles to the generated users.'
 			)
 		);
 		
@@ -188,6 +205,85 @@ class MdlUserListCreator {
 		} else {
 			$course = $arguments['course'];
 		}
+		
+		if(!$arguments['roles']) {
+			$roles = false;
+		} else {
+		
+			// using roles only make sense if a course is specified
+			if(!$course) {
+				\cli\err("ERROR: you can only specify roles in conjunction with a course.\n");
+				die(-1);
+			}
+				
+			$roles = $arguments['roles'];
+			$required_roles = array();
+			$role_def = false;			
+			
+			$extra_users = 0;
+			
+			// check to make sure we can load the role definitions
+			// start with the override file
+			if(is_readable(__DIR__ . self::OVERRIDE_ROLES_FILE)) {
+				$role_def = json_decode(file_get_contents(__DIR__ . self::OVERRIDE_ROLES_FILE), true);
+				
+				if($role_def == null) {
+					\cli\err("ERROR: Unable to load the role override file:\n" . self::OVERRIDE_ROLES_FILE . "\n");	
+					die(-1);
+				}
+			}
+			
+			// try the default role file
+			if($role_def == false) {
+				// try the default file
+				if(!is_readable(__DIR__ . self::DEFAULT_ROLES_FILE)) {
+					\cli\err("ERROR: Unable to locate the default role file:\n" . self::DEFAULT_ROLES_FILE . "\n");	
+					die(-1);
+				} else {
+					$role_def = json_decode(file_get_contents(__DIR__ . self::DEFAULT_ROLES_FILE), true);
+				}
+				
+				if($role_def == null) {
+					\cli\err("ERROR: Unable to load the default role file:\n" . self::OVERRIDE_ROLES_FILE . "\n");	
+					die(-1);
+				}
+			}
+			
+			// check the role arguments
+			// the groups of required number of users and roles are seperated with a ":"
+			$roles = explode(':', $roles);
+			
+			foreach($roles as $role) {
+				// the required number of users and role is seperated with a ","
+				$role = explode(',', $role);
+				
+				if(count($role) != 2) {
+					\cli\err("ERROR: Unable to parse the role argument:\n Check the format and try again.");	
+					die(-1);
+				}
+				
+				foreach($role as $r) {
+					if(!is_numeric($r)) {
+					 	\cli\err("ERROR: Unable to parse the role argument:\n Check the format and try again.");	
+					 	die(-1);
+				 	}
+				 	
+				 	if((int)$r != $r) {
+					 	\cli\err("ERROR: Unable to parse the role argument:\n Check the format and try again.");
+					 	die(-1);
+				 	}
+				}
+				
+				// check to see if the required role is defined
+				if(!array_key_exists($r[0], $role_def)) {
+					\cli\err("ERROR: Unable to find the required role $r in the list of roles:\n Check the format and try again.");
+					 die(-1);
+				}
+				
+				$required_roles[] = $role;
+				$extra_users += $role[1];
+			}
+		}
 	 	
 	 	// check to make sure we can access the data files
 	 	if(!is_readable(__DIR__ . self::MALE_DATA_PATH)) {
@@ -203,18 +299,6 @@ class MdlUserListCreator {
 	 	if(!is_readable(__DIR__ . self::LAST_NAME_DATA_PATH)) {
 		 	\cli\err("ERROR: Unable to access the last name data file\n");
 			die(-1);
-	 	}
-	 	
-	 	// output some information
-	 	if($course != false){
-		 	\cli\out("Creating file of $required_records user records\n");
-		 	\cli\out("  with email addresses @ $domain_name\n");
-		 	\cli\out("  with course short code: $course\n");
-		 	\cli\out("  to $output_path\n");
-	 	} else {
-		 	\cli\out("Creating file of $required_records user records\n");
-		 	\cli\out("  with email addresses @ $domain_name\n");
-		 	\cli\out("  to $output_path\n");
 	 	}
 	 	
 	 	// read in the data files
@@ -244,9 +328,60 @@ class MdlUserListCreator {
 	 	$female_count  = count($female_data) - 1;
 	 	$surname_count = count($surname_data) - 1;
 	 	
+	 	// calculate how many user records will be created
+	 	$create_users = $required_records;
+	 	
+	 	if(isset($extra_users)) {
+		 	$create_users += $extra_users; 
+	 	}
+	 	
+	 	// output some information
+	 	if($course != false){
+		 	\cli\out("Creating file of $create_users user records\n");
+		 	\cli\out("  with email addresses @ $domain_name\n");
+		 	\cli\out("  with course short code: $course\n");
+		 	\cli\out("  to $output_path\n");
+	 	} else {
+		 	\cli\out("Creating file of $create_users user records\n");
+		 	\cli\out("  with email addresses @ $domain_name\n");
+		 	\cli\out("  to $output_path\n");
+	 	}
+	 	
 	 	// generate the user records
 	 	$name_count = 0;
 	 	$user_records = array();
+	 	
+	 	
+	 	// create records with roles if required
+	 	if(isset($required_roles)) {
+		 	
+		 	foreach($required_roles as $role) {
+		 	
+		 		for($i = 0; $i < $role[1]; $i++) {
+		 		
+		 			// get a first name
+		 			if($i % 2 == 0) {
+				 		$first_name = $male_data[rand(0, $male_count)];
+				 	} else {
+					 	$first_name = $female_data[rand(0, $male_count)];
+				 	}
+				 	
+				 	// get a last name
+				 	$surname = $role_def[$role[0]];
+				 	
+				 	$user_name = strtolower($first_name . '.' . preg_replace("/[^A-Za-z0-9]/", '', $surname));
+				 	
+				 	if(!array_key_exists($user_name, $user_records)) {
+				 		$email_address = $user_name . '@' . $domain_name;
+				 		
+				 		$user_records[$user_name] = array($user_name, $this->generate_password(), $first_name , $surname, $email_address, $course, $role[0]);
+				 	} else {
+					 	$i--;
+				 	}
+		 		}		 	
+		 	}
+	 	}
+	 	
 	 	
 	 	while($name_count < $required_records) {
 	 		
@@ -267,7 +402,11 @@ class MdlUserListCreator {
 		 		$email_address = $user_name . '@' . $domain_name;
 		 		
 		 		if($course != false) {
-			 		$user_records[$user_name] = array($user_name, $this->generate_password(), $first_name , $surname, $email_address, $course);
+		 			if(isset($required_roles)) {
+				 		$user_records[$user_name] = array($user_name, $this->generate_password(), $first_name , $surname, $email_address, $course, '5');
+				 	} else {
+					 	$user_records[$user_name] = array($user_name, $this->generate_password(), $first_name , $surname, $email_address, $course);
+				 	}
 		 		} else {
 			 		$user_records[$user_name] = array($user_name, $this->generate_password(), $first_name , $surname, $email_address);
 		 		}
@@ -286,7 +425,9 @@ class MdlUserListCreator {
 	 	
 	 	// output the file header
 	 	//username,password,firstname,lastname,email
-	 	if($course != false) {
+	 	if(isset($required_roles)) {
+		 	$result = fwrite($output_handle, "username,password,firstname,lastname,email,course1,role1\n");
+	 	} else if($course != false) {
 		 	$result = fwrite($output_handle, "username,password,firstname,lastname,email,course1\n");
 	 	} else {
 		 	$result = fwrite($output_handle, "username,password,firstname,lastname,email\n");
@@ -313,7 +454,6 @@ class MdlUserListCreator {
 	 	
 	 	\cli\out("SUCCESS: File successfully created.\n");
 	}
-	
 	
 	// small private function to make reading in the data files easier
 	private function get_data($path) {
