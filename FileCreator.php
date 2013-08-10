@@ -57,7 +57,7 @@ class FileCreator {
 	/**
 	 * defines the version of the script
 	 */
-	const SCRIPT_VERSION = 'v1.0'; 
+	const SCRIPT_VERSION = 'v1.0.1'; 
 	
 	/**
 	 * deines the uri for more information
