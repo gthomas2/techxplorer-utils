@@ -157,8 +157,8 @@ class MdlUserListCreator {
 		
 		// show the help screen if required
 		if($arguments['help']) {
-			echo $arguments->getHelpScreen();
-			echo "\n\n";
+			\cli\out($arguments->getHelpScreen());
+			\cli\out("\n\n");
 			die(0);
 		}
 		
@@ -185,8 +185,8 @@ class MdlUserListCreator {
 		
 		// check the arguments
 		if(!$arguments['output']) {
-			echo $arguments->getHelpScreen();
-			echo "\n\n";
+			\cli\out($arguments->getHelpScreen());
+			\cli\out("\n\n");
 		 	die(-1);
 		} else {
 			$output_path = $arguments['output'];
@@ -218,8 +218,8 @@ class MdlUserListCreator {
 	 	}
 	 	
 		if(!$arguments['domain']) {
-			echo $arguments->getHelpScreen();
-			echo "\n\n";
+			\cli\out($arguments->getHelpScreen());
+			\cli\out("\n\n");
 		 	die(-1);
 		} else {
 			$domain_name = $arguments['domain'];

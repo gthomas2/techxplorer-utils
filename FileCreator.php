@@ -116,15 +116,15 @@ class FileCreator {
 		
 		// show the help screen if required
 		if($arguments['help']) {
-			echo $arguments->getHelpScreen();
-			echo "\n\n";
+			\cli\out($arguments->getHelpScreen());
+			\cli\out("\n\n");
 			die(0);
 		}
 		
 		// check the output and size arguments
 		if(!$arguments['output']) {
-			echo $arguments->getHelpScreen();
-			echo "\n\n";
+			\cli\out($arguments->getHelpScreen());
+			\cli\out("\n\n");
 		 	die(-1);
 		} else {
 			$output_path = $arguments['output'];
@@ -138,8 +138,8 @@ class FileCreator {
 	 	}
 		
 		if(!$arguments['size']) {
-			echo $arguments->getHelpScreen();
-			echo "\n\n";
+			\cli\out($arguments->getHelpScreen());
+			\cli\out("\n\n");
 		 	die(-1);
 		} else {
 			// convert the output size
