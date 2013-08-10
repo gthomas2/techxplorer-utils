@@ -123,6 +123,7 @@ class FileCreator {
 		
 		// check the output and size arguments
 		if(!$arguments['output']) {
+			\cli\out("Error: Missing required argument --output\n");
 			\cli\out($arguments->getHelpScreen());
 			\cli\out("\n\n");
 		 	die(-1);
@@ -138,6 +139,7 @@ class FileCreator {
 	 	}
 		
 		if(!$arguments['size']) {
+			\cli\out("Error: Missing required argument --size\n");
 			\cli\out($arguments->getHelpScreen());
 			\cli\out("\n\n");
 		 	die(-1);

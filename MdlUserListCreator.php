@@ -185,6 +185,7 @@ class MdlUserListCreator {
 		
 		// check the arguments
 		if(!$arguments['output']) {
+			\cli\out("Error: Missing required argument --output\n");
 			\cli\out($arguments->getHelpScreen());
 			\cli\out("\n\n");
 		 	die(-1);
@@ -218,6 +219,7 @@ class MdlUserListCreator {
 	 	}
 	 	
 		if(!$arguments['domain']) {
+			\cli\out("Error: Missing required argument --domain\n");
 			\cli\out($arguments->getHelpScreen());
 			\cli\out("\n\n");
 		 	die(-1);
