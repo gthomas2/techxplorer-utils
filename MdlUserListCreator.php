@@ -150,6 +150,7 @@ class MdlUserListCreator {
 		);
 		
 		$arguments->addFlag(array('help', 'h'), 'Show this help screen');
+		$arguments->addFlag(array('list-roles', 'l'), 'List available roles');
 		
 		// parse the arguments
 		$arguments->parse();
@@ -158,6 +159,27 @@ class MdlUserListCreator {
 		if($arguments['help']) {
 			echo $arguments->getHelpScreen();
 			echo "\n\n";
+			die(0);
+		}
+		
+		// output the list of avaialble roles
+		if($arguments['list-roles']) {
+		
+			// load the role data
+			$role_def = $this->load_role_definitions();
+			$roles = array();
+			
+			// turn the associative array into an array for output
+			foreach($role_def as $key => $value) {
+				$roles[] = array($key, $value);
+			}
+			
+			// output the table
+			\cli\out("List of available roles\n");
+			$table = new \cli\Table();
+			$table->setHeaders(array('ID', 'Description'));
+			$table->setRows($roles);
+			$table->display();
 			die(0);
 		}
 		
@@ -225,32 +247,7 @@ class MdlUserListCreator {
 			
 			$extra_users = 0;
 			
-			// check to make sure we can load the role definitions
-			// start with the override file
-			if(is_readable(__DIR__ . self::OVERRIDE_ROLES_FILE)) {
-				$role_def = json_decode(file_get_contents(__DIR__ . self::OVERRIDE_ROLES_FILE), true);
-				
-				if($role_def == null) {
-					\cli\err("ERROR: Unable to load the role override file:\n" . self::OVERRIDE_ROLES_FILE . "\n");	
-					die(-1);
-				}
-			}
-			
-			// try the default role file
-			if($role_def == false) {
-				// try the default file
-				if(!is_readable(__DIR__ . self::DEFAULT_ROLES_FILE)) {
-					\cli\err("ERROR: Unable to locate the default role file:\n" . self::DEFAULT_ROLES_FILE . "\n");	
-					die(-1);
-				} else {
-					$role_def = json_decode(file_get_contents(__DIR__ . self::DEFAULT_ROLES_FILE), true);
-				}
-				
-				if($role_def == null) {
-					\cli\err("ERROR: Unable to load the default role file:\n" . self::OVERRIDE_ROLES_FILE . "\n");	
-					die(-1);
-				}
-			}
+			$role_def = $this->load_role_definitions();
 			
 			// check the role arguments
 			// the groups of required number of users and roles are seperated with a ":"
@@ -456,6 +453,40 @@ class MdlUserListCreator {
 	 	fclose($output_handle);
 	 	
 	 	\cli\out("SUCCESS: File successfully created.\n");
+	}
+	
+	// small private function to load the role definition file
+	private function load_role_definitions() {
+	
+		$role_def = false;
+		
+		// start with the override file
+		if(is_readable(__DIR__ . self::OVERRIDE_ROLES_FILE)) {
+			$role_def = json_decode(file_get_contents(__DIR__ . self::OVERRIDE_ROLES_FILE), true);
+			
+			if($role_def == null) {
+				\cli\err("ERROR: Unable to load the role override file:\n" . self::OVERRIDE_ROLES_FILE . "\n");	
+				die(-1);
+			}
+		}
+		
+		// try the default role file
+		if($role_def == false) {
+			// try the default file
+			if(!is_readable(__DIR__ . self::DEFAULT_ROLES_FILE)) {
+				\cli\err("ERROR: Unable to locate the default role file:\n" . self::DEFAULT_ROLES_FILE . "\n");	
+				die(-1);
+			} else {
+				$role_def = json_decode(file_get_contents(__DIR__ . self::DEFAULT_ROLES_FILE), true);
+			}
+			
+			if($role_def == null) {
+				\cli\err("ERROR: Unable to load the default role file:\n" . self::OVERRIDE_ROLES_FILE . "\n");	
+				die(-1);
+			}
+		}
+		
+		return $role_def;
 	}
 	
 	// small private function to make reading in the data files easier
