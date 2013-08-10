@@ -195,14 +195,6 @@ class FileCreator {
 
             // update the notifier
             $notify->tick(); 
-            /*
-             $notify_size += self::CHUNK_SIZE;
-		 	
-		 	if($notify_size == $notify_size_limit){
-			 	\cli\out("Written $file_size bytes. " . self::human_readable_size($file_size) . "\n");
-			 	$notify_size = 0;
-		 	}
-             */
 	 	}
 	 	
 	 	// play nice and tidy up
