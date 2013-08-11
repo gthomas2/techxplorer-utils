@@ -172,7 +172,7 @@ class DbAssist {
 		}
 		
 		// call the appropriate user function
-		call_user_func('self::do_action_' . $action, $arguments);		
+		call_user_func('self::do_action_' . $action, $arguments, $pg_details, $this);		
 	}
 	
 	/**
@@ -181,7 +181,7 @@ class DbAssist {
 	 * @since 1.0
 	 * @author techxplorer <corey@techxplorer.com>
 	 */
-	static public function do_action_create($arguments) {
+	static public function do_action_create($arguments, $pg_details, $self) {
 	
 		$user = '';
 		$database = '';
@@ -207,7 +207,7 @@ class DbAssist {
 		}
 		
 		if(!$arguments['password']) {
-			$password = self::generate_password();
+			$password = $self->generate_password();
 		} else {
 			$password = $arguments['password'];
 		}
@@ -218,8 +218,80 @@ class DbAssist {
 		$table->setRows(array(array('Username', $user), array('Password', $password), array('Database Name', $database)));
 		$table->display();
 		
+		// get a connection to the database
+		$db_connection = $self->get_db_connection($pg_details);
+		
+		if($db_connection == false) {
+			\cli\err("Error: Unable to connect to the database\n");
+			die(-1);
+		}
+		
+		// check if the user already exists
+		$result = pg_query_params($db_connection, 'SELECT 1 FROM pg_roles WHERE rolname=$1', array($user));
+		
+		if(!$result) {
+			\cli\err("Error: Unable to check if the user already exists\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		if(pg_fetch_row($result) == true) {
+			\cli\err("Error: The user already exists\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		// check if the database exists
+		$result = pg_query_params($db_connection, 'SELECT 1 from pg_database WHERE datname=$1', array($database));
+		
+		if(!$result) {
+			\cli\err("Error: Unable to check if the database already exists\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		if(pg_fetch_row($result) == true) {
+			\cli\err("Error: The database already exists\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		// create the user and then create the database
+		$result = pg_query($db_connection, "create user $user with password '$password'");
+		
+		if(!$result) {
+			\cli\err("Error: Unable to create the user record\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		$result = pg_query($db_connection, "create database $database");
+		
+		if(!$result) {
+			\cli\err("Error: Unable to create the database\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		$result = pg_query($db_connection, "grant all privileges on database $database to $user");
+		
+		if(!$result) {
+			\cli\err("Error: Unable to grant the required privileges\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		//play nice and tidy up
+		pg_close($db_connection);
+		
+		\cli\out("Success: the user and matching database has been created.\n");
+		
 	}
 	
+	// private function to connect to the database
+	private function get_db_connection($pg_details) {
+		return pg_connect('host=' . $pg_details['host'] . ' dbname=' . $pg_details['database'] . ' user=' . $pg_details['user'] . ' password=' . $pg_details['password']);
+	}
 	
 	// private function to load configuration details
 	// small private function to load the role definition file
