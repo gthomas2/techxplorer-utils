@@ -92,7 +92,11 @@ class DbAssist {
 		\cli\out('License: ' . self::LICENSE_URI . "\n\n");
 		
 		// define a list of valid actions
-		$valid_actions = array('create' => 'Create a database and matching user');
+		$valid_actions = array(
+			'create' => 'Create a database and matching user',
+			'empty' => 'Empty a database',
+			'delete' => 'Delete a database and matching user'
+		);
 		
 		// get the database configuration
 		$pg_details = self::load_pg_details();
@@ -227,8 +231,8 @@ class DbAssist {
 		}
 		
 		// check if the user already exists
-		$result = pg_query_params($db_connection, 'SELECT 1 FROM pg_roles WHERE rolname=$1', array($user));
-		
+		$result = $self->user_exists($db_connection, $user);
+				
 		if(!$result) {
 			\cli\err("Error: Unable to check if the user already exists\n");
 			pg_close($db_connection);
@@ -242,8 +246,8 @@ class DbAssist {
 		}
 		
 		// check if the database exists
-		$result = pg_query_params($db_connection, 'SELECT 1 from pg_database WHERE datname=$1', array($database));
-		
+		$result = $self->database_exists($db_connection, $database);
+				
 		if(!$result) {
 			\cli\err("Error: Unable to check if the database already exists\n");
 			pg_close($db_connection);
@@ -257,7 +261,7 @@ class DbAssist {
 		}
 		
 		// create the user and then create the database
-		$result = pg_query($db_connection, "create user $user with password '$password'");
+		$result = $self->create_user($db_connection, $user, $password);
 		
 		if(!$result) {
 			\cli\err("Error: Unable to create the user record\n");
@@ -265,18 +269,10 @@ class DbAssist {
 			die(-1);
 		}
 		
-		$result = pg_query($db_connection, "create database $database");
+		$result = $self->create_database($db_connection, $database, $user);
 		
 		if(!$result) {
 			\cli\err("Error: Unable to create the database\n");
-			pg_close($db_connection);
-			die(-1);
-		}
-		
-		$result = pg_query($db_connection, "grant all privileges on database $database to $user");
-		
-		if(!$result) {
-			\cli\err("Error: Unable to grant the required privileges\n");
 			pg_close($db_connection);
 			die(-1);
 		}
@@ -286,6 +282,242 @@ class DbAssist {
 		
 		\cli\out("Success: the user and matching database has been created.\n");
 		
+	}
+	
+	/**
+	 * used to create a database and matching user
+	 *
+	 * @since 1.0
+	 * @author techxplorer <corey@techxplorer.com>
+	 */
+	static public function do_action_empty($arguments, $pg_details, $self) {
+	
+		$user = '';
+		$database = '';
+		$password = '';
+		
+		// get the required argument options
+		if(!$arguments['user']) {
+			\cli\out("Error: Missing required option: --user\n\n");
+			\cli\out($arguments->getHelpScreen());
+			\cli\out("\n\n");
+		 	die(-1);
+		} else {
+			$user = $arguments['user'];
+		}
+		
+		if(!$arguments['database']) {
+			\cli\out("Error: Missing required option: --database\n\n");
+			\cli\out($arguments->getHelpScreen());
+			\cli\out("\n\n");
+		 	die(-1);
+		} else {
+			$database = $arguments['database'];
+		}
+		
+		\cli\out("Attempting to empty a database with the following settings\n");
+		$table = new \cli\Table();
+		$table->setHeaders(array('Setting', 'Value'));
+		$table->setRows(array(array('Username', $user), array('Database Name', $database)));
+		$table->display();
+		
+		// get a connection to the database
+		$db_connection = $self->get_db_connection($pg_details);
+		
+		if($db_connection == false) {
+			\cli\err("Error: Unable to connect to the database\n");
+			die(-1);
+		}
+		
+		// check if the user already exists
+		$result = $self->user_exists($db_connection, $user);
+				
+		if(!$result) {
+			\cli\err("Error: Unable to check if the user already exists\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		if(!pg_fetch_row($result) == true) {
+			\cli\err("Error: The user doesn't exist\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		// check if the database exists
+		$result = $self->database_exists($db_connection, $database);
+				
+		if(!$result) {
+			\cli\err("Error: Unable to check if the database already exists\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		if(!pg_fetch_row($result) == true) {
+			\cli\err("Error: The database doesn't exist\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		// drop the existing database and then recreate it
+		$result = $self->drop_database($db_connection, $database, $user);
+		
+		if(!$result) {
+			\cli\err("Error: Unable to drop the existing database\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		$result = $self->create_database($db_connection, $database, $user);
+		
+		if(!$result) {
+			\cli\err("Error: Unable to create the database\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		//play nice and tidy up
+		pg_close($db_connection);
+		
+		\cli\out("Success: the specified database has been dropped and recreated.\n");
+		
+	}
+	
+	/**
+	 * used to create a database and matching user
+	 *
+	 * @since 1.0
+	 * @author techxplorer <corey@techxplorer.com>
+	 */
+	static public function do_action_delete($arguments, $pg_details, $self) {
+	
+		$user = '';
+		$database = '';
+		$password = '';
+		
+		// get the required argument options
+		if(!$arguments['user']) {
+			\cli\out("Error: Missing required option: --user\n\n");
+			\cli\out($arguments->getHelpScreen());
+			\cli\out("\n\n");
+		 	die(-1);
+		} else {
+			$user = $arguments['user'];
+		}
+		
+		if(!$arguments['database']) {
+			\cli\out("Error: Missing required option: --database\n\n");
+			\cli\out($arguments->getHelpScreen());
+			\cli\out("\n\n");
+		 	die(-1);
+		} else {
+			$database = $arguments['database'];
+		}
+		
+		\cli\out("Attempting to delete a database and matching user with the following settings\n");
+		$table = new \cli\Table();
+		$table->setHeaders(array('Setting', 'Value'));
+		$table->setRows(array(array('Username', $user), array('Database Name', $database)));
+		$table->display();
+		
+		// get a connection to the database
+		$db_connection = $self->get_db_connection($pg_details);
+		
+		if($db_connection == false) {
+			\cli\err("Error: Unable to connect to the database\n");
+			die(-1);
+		}
+		
+		// check if the user already exists
+		$result = $self->user_exists($db_connection, $user);
+				
+		if(!$result) {
+			\cli\err("Error: Unable to check if the user already exists\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		if(!pg_fetch_row($result) == true) {
+			\cli\err("Error: The user doesn't exist\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		// check if the database exists
+		$result = $self->database_exists($db_connection, $database);
+				
+		if(!$result) {
+			\cli\err("Error: Unable to check if the database already exists\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		if(!pg_fetch_row($result) == true) {
+			\cli\err("Error: The database doesn't exist\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		// drop the existing database
+		$result = $self->drop_database($db_connection, $database);
+		
+		if(!$result) {
+			\cli\err("Error: Unable to drop the existing database\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		// drop the existing user
+		$result = $self->drop_user($db_connection, $user);
+				
+		if(!$result) {
+			\cli\err("Error: Unable to delete the existing user\n");
+			pg_close($db_connection);
+			die(-1);
+		}
+		
+		//play nice and tidy up
+		pg_close($db_connection);
+		
+		\cli\out("Success: the specified database and user has been deleted.\n");
+		
+	}
+	
+	// private function to drop a user
+	private function drop_user($db_connection, $user) {
+		return pg_query($db_connection, "drop user $user");
+	}
+
+	// private function to drop a database
+	private function drop_database($db_connection, $database) {
+		return pg_query($db_connection, "drop database $database");
+	}
+	
+	// create a database, associating it with a user
+	private function create_database($db_connection, $database, $user) {
+		$result = pg_query($db_connection, "create database $database");
+		
+		if(!$result) {
+			return false;
+		}
+		
+		return pg_query($db_connection, "grant all privileges on database $database to $user");
+	}
+	
+	// private function to create a user
+	private function create_user($db_connection, $user, $password) {
+		return pg_query($db_connection, "create user $user with password '$password'");
+
+	}
+	
+	// private function to see if the database exists
+	private function database_exists($db_connection, $database) {
+		return pg_query_params($db_connection, 'SELECT 1 from pg_database WHERE datname=$1', array($database));
+	}
+	
+	// private function to see if the user exists
+	private function user_exists($db_connection, $user) {
+		return pg_query_params($db_connection, 'SELECT 1 FROM pg_roles WHERE rolname=$1', array($user));
 	}
 	
 	// private function to connect to the database
