@@ -22,7 +22,7 @@
 error_reporting(E_ALL);
 
 // include the required libraries
-require('vendor/autoload.php');
+require(__DIR__ . 'vendor/autoload.php');
 
 // work around a bug in the Arguments class of the CLI package
 $path = __DIR__ . '/vendor/jlogsdon/cli';
@@ -30,7 +30,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $path);
 
 /**
  * a php script which can be used to create a file of a
- * specified length
+ * specified size 
  *
  * @since 1.0
  * @author techxplorer <corey@techxplorer.com>
@@ -57,7 +57,7 @@ class FileCreator {
 	/**
 	 * defines the version of the script
 	 */
-	const SCRIPT_VERSION = 'v1.0.1';
+	const SCRIPT_VERSION = 'v1.0.1.1';
 
 	/**
 	 * deines the uri for more information
@@ -248,8 +248,6 @@ class FileCreator {
 	 * @link http://jeffreysambells.com/2012/10/25/human-readable-filesize-php based on the code at this uri
 	 *
 	 * @since 1.0
-	 * @author techxplorer <corey@techxplorer.com>
-	 *
 	 */
 	public static function human_readable_size($bytes, $decimals = 2) {
 		$size = array('B','kB','MB','GB','TB','PB','EB','ZB','YB');
