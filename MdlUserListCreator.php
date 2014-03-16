@@ -53,7 +53,7 @@ class MdlUserListCreator {
 	/**
 	 * defines the version of the script
 	 */
-	const SCRIPT_VERSION = 'v1.0.1';
+	const SCRIPT_VERSION = 'v1.0.2';
 
 	/**
 	 * defines the uri for more information
@@ -95,6 +95,11 @@ class MdlUserListCreator {
 	 */
 	const DEFAULT_RECORD_COUNT = 100;
 
+    /**
+     * defines the default domain for email addresses
+     */
+    const DEFAULT_EMAIL_DOMAIN = 'example.com';
+
 	/**
 	 * main driving function
 	 *
@@ -119,14 +124,14 @@ class MdlUserListCreator {
 
 		$arguments->addOption(array('number', 'n'),
 			array(
-				'default' => '',
+				'default' => self::DEFAULT_RECORD_COUNT,
 				'description' => 'Set the number of records to create'
 			)
 		);
 
 		$arguments->addOption(array('domain', 'd'),
 			array (
-				'default' => '',
+				'default' => self::DEFAULT_EMAIL_DOMAIN,
 				'description' => 'The domain name to use when generating email addresses'
 			)
 		);
@@ -138,10 +143,10 @@ class MdlUserListCreator {
 			)
 		);
 
-		$arguments->addOption(array('roles', 'r'),
+		$arguments->addOption(array('role', 'r'),
 			array(
 				'default' => '',
-				'description' => 'Assign roles to the generated users.'
+				'description' => 'Assign the specified role to the generated users'
 			)
 		);
 
@@ -215,10 +220,7 @@ class MdlUserListCreator {
 	 	}
 
 		if(!$arguments['domain']) {
-			\cli\out("Error: Missing required argument --domain\n");
-			\cli\out($arguments->getHelpScreen());
-			\cli\out("\n\n");
-		 	die(-1);
+			$domain_name = self::DEFAULT_EMAIL_DOMAIN;
 		} else {
 			$domain_name = $arguments['domain'];
 		}
@@ -229,57 +231,43 @@ class MdlUserListCreator {
 			$course = $arguments['course'];
 		}
 
-		if(!$arguments['roles']) {
-			$roles = false;
+		if(!$arguments['role']) {
+		    $role = false;
 		} else {
 
-			// using roles only make sense if a course is specified
+			// using role only makes sense if a course is specified
 			if(!$course) {
-				\cli\err("ERROR: you can only specify roles in conjunction with a course.\n");
+				\cli\err("ERROR: you can only specify a role in conjunction with a course\n");
 				die(-1);
 			}
 
-			$roles = $arguments['roles'];
-			$required_roles = array();
-			$role_def = false;
-
-			$extra_users = 0;
-
+            // get the role definition list
 			$role_def = $this->load_role_definitions();
 
-			// check the role arguments
-			// the groups of required number of users and roles are seperated with a ":"
-			$roles = explode(':', $roles);
+			// is this is a numeric or string role
+			if(!is_numeric($arguments['role'])) {
+			    // string
+			    $tmp = strtolower(trim($arguments['role']));
 
-			foreach($roles as $role) {
-				// the required number of users and role is seperated with a ","
-				$role = explode(',', $role);
+    			foreach($role_def as $key => $value) {
+    			    if($value == $tmp) {
+        			    $role = $key;
+    			    }
+    			}
 
-				if(count($role) != 2) {
-					\cli\err("ERROR: Unable to parse the role argument:\n Check the format and try again.");
-					die(-1);
-				}
+    			if($role === false) {
+        			\cli\err("ERROR: Un-recognised role name '$role'\n");
+        			die(-1);
+    			}
 
-				foreach($role as $r) {
-					if(!is_numeric($r)) {
-					 	\cli\err("ERROR: Unable to parse the role argument:\n Check the format and try again.");
-					 	die(-1);
-				 	}
+			} else {
+    			// numeric
+    			if(!array_key_exists($arguments['role'], $role_def)) {
+        			\cli\err("ERROR: Un-recognised role id '{$arguments['role']}'\n");
+        			die(-1);
+    			}
 
-				 	if((int)$r != $r) {
-					 	\cli\err("ERROR: Unable to parse the role argument:\n Check the format and try again.");
-					 	die(-1);
-				 	}
-				}
-
-				// check to see if the required role is defined
-				if(!array_key_exists($r[0], $role_def)) {
-					\cli\err("ERROR: Unable to find the required role $r in the list of roles:\n Check the format and try again.");
-					 die(-1);
-				}
-
-				$required_roles[] = $role;
-				$extra_users += $role[1];
+    			$role = $arguments['role'];
 			}
 		}
 
@@ -326,21 +314,17 @@ class MdlUserListCreator {
 	 	$female_count  = count($female_data) - 1;
 	 	$surname_count = count($surname_data) - 1;
 
-	 	// calculate how many user records will be created
-	 	$create_users = $required_records;
-
-	 	if(isset($extra_users)) {
-		 	$create_users += $extra_users;
-	 	}
-
 	 	// output some information
 	 	if($course != false){
-		 	\cli\out("Creating file of $create_users user records\n");
+		 	\cli\out("Creating file of $required_records user records\n");
 		 	\cli\out("  with email addresses @ $domain_name\n");
 		 	\cli\out("  with course short code: $course\n");
+		 	if(!$role) {
+    		 	\cli\out("  with role id: $role\n");
+		 	}
 		 	\cli\out("  to $output_path\n");
 	 	} else {
-		 	\cli\out("Creating file of $create_users user records\n");
+		 	\cli\out("Creating file of $required_records user records\n");
 		 	\cli\out("  with email addresses @ $domain_name\n");
 		 	\cli\out("  to $output_path\n");
 	 	}
@@ -348,38 +332,6 @@ class MdlUserListCreator {
 	 	// generate the user records
 	 	$name_count = 0;
 	 	$user_records = array();
-
-
-	 	// create records with roles if required
-	 	if(isset($required_roles)) {
-
-		 	foreach($required_roles as $role) {
-
-		 		for($i = 0; $i < $role[1]; $i++) {
-
-		 			// get a first name
-		 			if($i % 2 == 0) {
-				 		$first_name = $male_data[rand(0, $male_count)];
-				 	} else {
-					 	$first_name = $female_data[rand(0, $male_count)];
-				 	}
-
-				 	// get a last name
-				 	$surname = $role_def[$role[0]];
-
-				 	$user_name = strtolower($first_name . '.' . preg_replace("/[^A-Za-z0-9]/", '', $surname));
-
-				 	if(!array_key_exists($user_name, $user_records)) {
-				 		$email_address = $user_name . '@' . $domain_name;
-
-				 		$user_records[$user_name] = array($user_name, $this->generate_password(), $first_name , $surname, $email_address, $course, $role[0]);
-				 	} else {
-					 	$i--;
-				 	}
-		 		}
-		 	}
-	 	}
-
 
 	 	while($name_count < $required_records) {
 
@@ -400,8 +352,8 @@ class MdlUserListCreator {
 		 		$email_address = $user_name . '@' . $domain_name;
 
 		 		if($course != false) {
-		 			if(isset($required_roles)) {
-				 		$user_records[$user_name] = array($user_name, $this->generate_password(), $first_name , $surname, $email_address, $course, '5');
+		 			if($role !== false) {
+				 		$user_records[$user_name] = array($user_name, $this->generate_password(), $first_name , $surname, $email_address, $course, $role);
 				 	} else {
 					 	$user_records[$user_name] = array($user_name, $this->generate_password(), $first_name , $surname, $email_address, $course);
 				 	}
@@ -423,7 +375,7 @@ class MdlUserListCreator {
 
 	 	// output the file header
 	 	//username,password,firstname,lastname,email
-	 	if(isset($required_roles)) {
+	 	if($role !== false) {
 		 	$result = fwrite($output_handle, "username,password,firstname,lastname,email,course1,role1\n");
 	 	} else if($course != false) {
 		 	$result = fwrite($output_handle, "username,password,firstname,lastname,email,course1\n");
@@ -457,6 +409,7 @@ class MdlUserListCreator {
 	private function load_role_definitions() {
 
 		$role_def = false;
+		$roles = array();
 
 		// start with the override file
 		if(is_readable(__DIR__ . self::OVERRIDE_ROLES_FILE)) {
@@ -484,7 +437,17 @@ class MdlUserListCreator {
 			}
 		}
 
-		return $role_def;
+		// ensure consistent format of the role_def
+		foreach($role_def as $key => $value) {
+    		if(!is_numeric($key)) {
+        		\cli\err("ERROR: invalid key value found in role definition file");
+        		die(-1);
+    		}
+
+    		$roles[$key] = strtolower($value);
+		}
+
+		return $roles;
 	}
 
 	// small private function to make reading in the data files easier
