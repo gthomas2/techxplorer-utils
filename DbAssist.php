@@ -25,10 +25,6 @@ ini_set('display_errors', 'stderr');
 // include the required libraries
 require(__DIR__ . '/vendor/autoload.php');
 
-// work around a bug in the Arguments class of the CLI package
-$path = __DIR__ . '/vendor/jlogsdon/cli';
-set_include_path(get_include_path() . PATH_SEPARATOR . $path);
-
 /**
  * a php script which can be used to help undertake a variety of
  * repetative database related tasks

@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jlogsdon/php-cli-tools.git",
-                "reference": "e5d20d447b97a0b9d6a40bcd40307e2173d2e3a0"
+                "reference": "ee739f6c470e77732723597f34b4e5661756349d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jlogsdon/php-cli-tools/zipball/e5d20d447b97a0b9d6a40bcd40307e2173d2e3a0",
-                "reference": "e5d20d447b97a0b9d6a40bcd40307e2173d2e3a0",
+                "url": "https://api.github.com/repos/jlogsdon/php-cli-tools/zipball/ee739f6c470e77732723597f34b4e5661756349d",
+                "reference": "ee739f6c470e77732723597f34b4e5661756349d",
                 "shasum": ""
             },
             "require": {
@@ -48,7 +48,7 @@
                 "cli",
                 "console"
             ],
-            "time": "2013-07-08 21:20:00"
+            "time": "2014-02-20 16:37:01"
         }
     ],
     "packages-dev": [

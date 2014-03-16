@@ -23,11 +23,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 'stderr');
 
 // include the required libraries
-require('vendor/autoload.php');
-
-// work around a bug in the Arguments class of the CLI package
-$path = __DIR__ . '/vendor/jlogsdon/cli';
-set_include_path(get_include_path() . PATH_SEPARATOR . $path);
+require(__DIR__ . '/vendor/autoload.php');
 
 /**
  * a php script which can be used to create a file of
