@@ -23,7 +23,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 'stderr');
 
 // include the required libraries
-require('vendor/autoload.php');
+require(__DIR__ . '/vendor/autoload.php');
 
 // work around a bug in the Arguments class of the CLI package
 $path = __DIR__ . '/vendor/jlogsdon/cli';
@@ -58,7 +58,7 @@ class DbAssist {
 	/**
 	 * defines the version of the script
 	 */
-	const SCRIPT_VERSION = 'v1.1';
+	const SCRIPT_VERSION = 'v1.2';
 
 	/**
 	 * defines the uri for more information
@@ -71,12 +71,12 @@ class DbAssist {
 	const LICENSE_URI = 'http://opensource.org/licenses/GPL-3.0';
 
 	/**
-	 * define the default role definition file
+	 * define the default configuration file
 	 */
 	const DEFAULT_CFG_FILE = '/data/db-assist.json.dist';
 
 	/**
-	 * define the override role definition file
+	 * define the configuration override file
 	 */
 	const OVERRIDE_CFG_FILE = '/data/db-assist.json';
 
@@ -179,45 +179,59 @@ class DbAssist {
 		}
 
 		// call the appropriate user function
-		call_user_func('self::do_action_' . $action, $arguments, $pg_details, $this);
+		call_user_func('self::do_action_' . $action, $arguments, $pg_details);
 	}
 
+    /**
+     * use to gather the minimum required information to undertake a taks
+     *
+     * @param array $arguments list of command line arguments
+     * @return array an array contain the 'user', 'database' and 'password' elements
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+    static public function get_arguments($arguments) {
+
+         // get the required argument options
+         if(!$arguments['user']) {
+             \cli\out("ERROR: Missing required argument: --user\n\n");
+             \cli\out($arguments->getHelpScreen());
+             \cli\out("\n\n");
+             die(-1);
+         } else {
+             $user = $arguments['user'];
+         }
+
+         if(!$arguments['database']) {
+             \cli\out("WARNING: Missing optional option: --database\n");
+             \cli\out("         Using the user name as the database name\n\n");
+             $database = $user;
+         } else {
+             $database = $arguments['database'];
+         }
+
+         if(!$arguments['password']) {
+             $password = DbAssist::generate_password();
+         } else {
+             $password = $arguments['password'];
+         }
+
+        return array($user, $database, $password);
+    }
+
 	/**
-	 * used to create a database and matching user
-	 *
-	 * @since 1.0
-	 * @author techxplorer <corey@techxplorer.com>
-	 */
-	static public function do_action_create($arguments, $pg_details, $self) {
+     * create a database and associated user
+     *
+     * @param array $arguments list of command line arguments
+     * @param array $pg_details postgres connection details
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+	static public function do_action_create($arguments, $pg_details) {
 
-		$user = '';
-		$database = '';
-		$password = '';
-
-		// get the required argument options
-		if(!$arguments['user']) {
-			\cli\out("Error: Missing required option: --user\n\n");
-			\cli\out($arguments->getHelpScreen());
-			\cli\out("\n\n");
-		 	die(-1);
-		} else {
-			$user = $arguments['user'];
-		}
-
-		if(!$arguments['database']) {
-			\cli\out("Error: Missing required option: --database\n\n");
-			\cli\out($arguments->getHelpScreen());
-			\cli\out("\n\n");
-		 	die(-1);
-		} else {
-			$database = $arguments['database'];
-		}
-
-		if(!$arguments['password']) {
-			$password = $self->generate_password();
-		} else {
-			$password = $arguments['password'];
-		}
+        list($user, $database, $password) = DbAssist::get_arguments($arguments);
 
 		\cli\out("Attempting to create a database with the following settings\n");
 		$table = new \cli\Table();
@@ -226,56 +240,56 @@ class DbAssist {
 		$table->display();
 
 		// get a connection to the database
-		$db_connection = $self->get_db_connection($pg_details);
+		$db_connection = DbAssist::get_db_connection($pg_details);
 
 		if($db_connection == false) {
-			\cli\err("Error: Unable to connect to the database\n");
+			\cli\err("ERROR: Unable to connect to the database\n");
 			die(-1);
 		}
 
 		// check if the user already exists
-		$result = $self->user_exists($db_connection, $user);
+		$result = DbAssist::user_exists($db_connection, $user);
 
 		if(!$result) {
-			\cli\err("Error: Unable to check if the user already exists\n");
+			\cli\err("ERROR: Unable to check if the user already exists\n");
 			pg_close($db_connection);
 			die(-1);
 		}
 
 		if(pg_fetch_row($result) == true) {
-			\cli\err("Error: The user already exists\n");
+			\cli\err("ERROR: The user already exists\n");
 			pg_close($db_connection);
 			die(-1);
 		}
 
 		// check if the database exists
-		$result = $self->database_exists($db_connection, $database);
+		$result = DbAssist::database_exists($db_connection, $database);
 
 		if(!$result) {
-			\cli\err("Error: Unable to check if the database already exists\n");
+			\cli\err("ERROR: Unable to check if the database already exists\n");
 			pg_close($db_connection);
 			die(-1);
 		}
 
 		if(pg_fetch_row($result) == true) {
-			\cli\err("Error: The database already exists\n");
+			\cli\err("ERROR: The database already exists\n");
 			pg_close($db_connection);
 			die(-1);
 		}
 
 		// create the user and then create the database
-		$result = $self->create_user($db_connection, $user, $password);
+		$result = DbAssist::create_user($db_connection, $user, $password);
 
 		if(!$result) {
-			\cli\err("Error: Unable to create the user record\n");
+			\cli\err("ERROR: Unable to create the user\n");
 			pg_close($db_connection);
 			die(-1);
 		}
 
-		$result = $self->create_database($db_connection, $database, $user);
+		$result = DbAssist::create_database($db_connection, $database, $user);
 
 		if(!$result) {
-			\cli\err("Error: Unable to create the database\n");
+			\cli\err("ERROR: Unable to create the database\n");
 			pg_close($db_connection);
 			die(-1);
 		}
@@ -283,40 +297,21 @@ class DbAssist {
 		//play nice and tidy up
 		pg_close($db_connection);
 
-		\cli\out("Success: the user and matching database has been created.\n");
-
+		\cli\out("SUCCESS: the user and matching database has been created.\n");
 	}
 
 	/**
-	 * used to create a database and matching user
-	 *
-	 * @since 1.0
-	 * @author techxplorer <corey@techxplorer.com>
-	 */
-	static public function do_action_empty($arguments, $pg_details, $self) {
+     * Drop and re-create a database
+     *
+     * @param array $arguments list of command line arguments
+     * @param array $pg_details postgres connection details
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+	static public function do_action_empty($arguments, $pg_details) {
 
-		$user = '';
-		$database = '';
-		$password = '';
-
-		// get the required argument options
-		if(!$arguments['user']) {
-			\cli\out("Error: Missing required option: --user\n\n");
-			\cli\out($arguments->getHelpScreen());
-			\cli\out("\n\n");
-		 	die(-1);
-		} else {
-			$user = $arguments['user'];
-		}
-
-		if(!$arguments['database']) {
-			\cli\out("Error: Missing required option: --database\n\n");
-			\cli\out($arguments->getHelpScreen());
-			\cli\out("\n\n");
-		 	die(-1);
-		} else {
-			$database = $arguments['database'];
-		}
+		list($user, $database) = DbAssist::get_arguments($arguments);
 
 		\cli\out("Attempting to empty a database with the following settings\n");
 		$table = new \cli\Table();
@@ -325,7 +320,7 @@ class DbAssist {
 		$table->display();
 
 		// get a connection to the database
-		$db_connection = $self->get_db_connection($pg_details);
+		$db_connection = DbAssist::get_db_connection($pg_details);
 
 		if($db_connection == false) {
 			\cli\err("Error: Unable to connect to the database\n");
@@ -333,7 +328,7 @@ class DbAssist {
 		}
 
 		// check if the user already exists
-		$result = $self->user_exists($db_connection, $user);
+		$result = DbAssist::user_exists($db_connection, $user);
 
 		if(!$result) {
 			\cli\err("Error: Unable to check if the user already exists\n");
@@ -348,7 +343,7 @@ class DbAssist {
 		}
 
 		// check if the database exists
-		$result = $self->database_exists($db_connection, $database);
+		$result = DbAssist::database_exists($db_connection, $database);
 
 		if(!$result) {
 			\cli\err("Error: Unable to check if the database already exists\n");
@@ -363,7 +358,7 @@ class DbAssist {
 		}
 
 		// drop the existing database and then recreate it
-		$result = $self->drop_database($db_connection, $database, $user);
+		$result = DbAssist::drop_database($db_connection, $database, $user);
 
 		if(!$result) {
 			\cli\err("Error: Unable to drop the existing database\n");
@@ -371,7 +366,7 @@ class DbAssist {
 			die(-1);
 		}
 
-		$result = $self->create_database($db_connection, $database, $user);
+		$result = DbAssist::create_database($db_connection, $database, $user);
 
 		if(!$result) {
 			\cli\err("Error: Unable to create the database\n");
@@ -387,35 +382,17 @@ class DbAssist {
 	}
 
 	/**
-	 * used to create a database and matching user
-	 *
-	 * @since 1.0
-	 * @author techxplorer <corey@techxplorer.com>
-	 */
-	static public function do_action_delete($arguments, $pg_details, $self) {
+     * Drop a database and the associated user
+     *
+     * @param array $arguments list of command line arguments
+     * @param array $pg_details postgres connection details
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+	static public function do_action_delete($arguments, $pg_details) {
 
-		$user = '';
-		$database = '';
-		$password = '';
-
-		// get the required argument options
-		if(!$arguments['user']) {
-			\cli\out("Error: Missing required option: --user\n\n");
-			\cli\out($arguments->getHelpScreen());
-			\cli\out("\n\n");
-		 	die(-1);
-		} else {
-			$user = $arguments['user'];
-		}
-
-		if(!$arguments['database']) {
-			\cli\out("Error: Missing required option: --database\n\n");
-			\cli\out($arguments->getHelpScreen());
-			\cli\out("\n\n");
-		 	die(-1);
-		} else {
-			$database = $arguments['database'];
-		}
+		list($user, $database) = DbAssist::get_arguments($arguments);
 
 		\cli\out("Attempting to delete a database and matching user with the following settings\n");
 		$table = new \cli\Table();
@@ -424,7 +401,7 @@ class DbAssist {
 		$table->display();
 
 		// get a connection to the database
-		$db_connection = $self->get_db_connection($pg_details);
+		$db_connection = DbAssist::get_db_connection($pg_details);
 
 		if($db_connection == false) {
 			\cli\err("Error: Unable to connect to the database\n");
@@ -432,7 +409,7 @@ class DbAssist {
 		}
 
 		// check if the user already exists
-		$result = $self->user_exists($db_connection, $user);
+		$result = DbAssist::user_exists($db_connection, $user);
 
 		if(!$result) {
 			\cli\err("Error: Unable to check if the user already exists\n");
@@ -447,7 +424,7 @@ class DbAssist {
 		}
 
 		// check if the database exists
-		$result = $self->database_exists($db_connection, $database);
+		$result = DbAssist::database_exists($db_connection, $database);
 
 		if(!$result) {
 			\cli\err("Error: Unable to check if the database already exists\n");
@@ -462,7 +439,7 @@ class DbAssist {
 		}
 
 		// drop the existing database
-		$result = $self->drop_database($db_connection, $database);
+		$result = DbAssist::drop_database($db_connection, $database);
 
 		if(!$result) {
 			\cli\err("Error: Unable to drop the existing database\n");
@@ -471,7 +448,7 @@ class DbAssist {
 		}
 
 		// drop the existing user
-		$result = $self->drop_user($db_connection, $user);
+		$result = DbAssist::drop_user($db_connection, $user);
 
 		if(!$result) {
 			\cli\err("Error: Unable to delete the existing user\n");
@@ -483,23 +460,25 @@ class DbAssist {
 		pg_close($db_connection);
 
 		\cli\out("Success: the specified database and user has been deleted.\n");
-
 	}
 
 	/**
-	 * used to list databases and matching users
-	 *
-	 * @since 1.0
-	 * @author techxplorer <corey@techxplorer.com>
-	 */
-	static public function do_action_list($arguments, $pg_details, $self) {
+     * List databases and thie associated users
+     *
+     * @param array $arguments list of command line arguments
+     * @param array $pg_details postgres connection details
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+	static public function do_action_list($arguments, $pg_details) {
 
 		\cli\out("Attempting to list all databases and users\n");
 		$table = new \cli\Table();
 		$table->setHeaders(array('Databases', 'User List'));
 
 		// get a connection to the database
-		$db_connection = $self->get_db_connection($pg_details);
+		$db_connection = DbAssist::get_db_connection($pg_details);
 
 		if($db_connection == false) {
 			\cli\err("Error: Unable to connect to the database\n");
@@ -507,10 +486,10 @@ class DbAssist {
 		}
 
 		// get a list of databases
-		$databases = $self->get_database_list($db_connection);
+		$databases = DbAssist::get_database_list($db_connection);
 
 		// get a list of users
-		$list = $self->get_user_list($db_connection, $databases);
+		$list = DbAssist::get_user_list($db_connection, $databases);
 		$table->setRows($list);
 		$table->display();
 
@@ -518,8 +497,18 @@ class DbAssist {
 		pg_close($db_connection);
 	}
 
-	// private function to get list of users
-	private function get_user_list($db_connection, $databases) {
+    /**
+     * get a list of users associated with a list of databases
+     *
+     * @param resource $db_connection to the database
+     * @param array $databases list of databases
+     *
+     * @return array list of users and databases
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+	static public function get_user_list($db_connection, $databases) {
 
 	$sql = "SELECT u.usename, d.datname
 FROM pg_user u,
@@ -554,8 +543,18 @@ ORDER by u.usename";
 		return $users;
 	}
 
-	// private function to get list of databases
-	private function get_database_list($db_connection) {
+	/**
+     * get a list of databases
+     *
+     * @param resource $db_connection to the database
+     * @param array list of databases
+     *
+     * @return array list of databases
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+	public static function get_database_list($db_connection) {
 
 		// skip databases
 		$skip = array('template0', 'template1', 'postgres');
@@ -580,18 +579,49 @@ ORDER by u.usename";
 		return $databases;
 	}
 
-	// private function to drop a user
-	private function drop_user($db_connection, $user) {
+	/**
+     * drop a user
+     *
+     * @param resource $db_connection to the database
+     * @param string $user the name of the user to drop
+     *
+     * @return resource result of executing the query
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+	static public function drop_user($db_connection, $user) {
 		return pg_query($db_connection, "drop user $user");
 	}
 
-	// private function to drop a database
-	private function drop_database($db_connection, $database) {
+	/**
+     * drop a database
+     *
+     * @param resource $db_connection to the database
+     * @param string $database the name of the database to drop
+     *
+     * @return resource result of executing the query
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+	static public function drop_database($db_connection, $database) {
 		return pg_query($db_connection, "drop database $database");
 	}
 
-	// create a database, associating it with a user
-	private function create_database($db_connection, $database, $user) {
+	/**
+     * create a database and associate a user with it
+     *
+     * @param resource $db_connection to the database
+     * @param string $database the name of the database
+     * @param string $user the name of the user to associate with it
+     *
+     * @return resource result of executing the query
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+	static public function create_database($db_connection, $database, $user) {
 		$result = pg_query($db_connection, "create database $database");
 
 		if(!$result) {
@@ -601,29 +631,79 @@ ORDER by u.usename";
 		return pg_query($db_connection, "grant all privileges on database $database to $user");
 	}
 
-	// private function to create a user
-	private function create_user($db_connection, $user, $password) {
+	/**
+     * create a user
+     *
+     * @param resource $db_connection to the database
+     * @param string $user the name of the user to create
+     * @param string $password the password for the new user
+     *
+     * @return resource result of executing the query
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+	static public function create_user($db_connection, $user, $password) {
 		return pg_query($db_connection, "create user $user with password '$password'");
 
 	}
 
-	// private function to see if the database exists
-	private function database_exists($db_connection, $database) {
+	/**
+     * check to see if the database exists
+     *
+     * @param resource $db_connection to the database
+     * @param string $database the name of the database
+     *
+     * @return resource result of executing the query
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+	static public function database_exists($db_connection, $database) {
 		return pg_query_params($db_connection, 'SELECT 1 from pg_database WHERE datname=$1', array($database));
 	}
 
-	// private function to see if the user exists
-	private function user_exists($db_connection, $user) {
+	/**
+     * check to see if the user exists
+     *
+     * @param resource $db_connection to the database
+     * @param string $user the name of the database
+     *
+     * @return resource result of executing the query
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+    static public function user_exists($db_connection, $user) {
 		return pg_query_params($db_connection, 'SELECT 1 FROM pg_roles WHERE rolname=$1', array($user));
 	}
 
-	// private function to connect to the database
-	private function get_db_connection($pg_details) {
+	/**
+     * get a connection to the database
+     *
+     * @param resource $db_connection to the database
+     * @param string $user the name of the database
+     *
+     * @return resource result of executing the query
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
+    static public function get_db_connection($pg_details) {
 		return pg_connect('host=' . $pg_details['host'] . ' dbname=' . $pg_details['database'] . ' user=' . $pg_details['user'] . ' password=' . $pg_details['password']);
 	}
 
-	// private function to load configuration details
-	// small private function to load the role definition file
+	/**
+     * load the database connection details from the default or override config file
+     *
+     * @param resource $db_connection to the database
+     * @param string $user the name of the database
+     *
+     * @return resource result of executing the query
+     *
+     * @since 1.0
+     * @author techxplorer <corey@techxplorer.com>
+     */
 	private function load_pg_details() {
 
 		$pg_details = false;
@@ -657,10 +737,22 @@ ORDER by u.usename";
 		return $pg_details;
 	}
 
-	// function to generate passwords derived from
-	// https://gist.github.com/tylerhall/521810
-	// and considered to be in the public domain
-	private function generate_password($length = 8, $add_dashes = false, $available_sets = 'luds') {
+    /**
+     * generate a password
+     *
+     * @param integer $length the length of the dabase
+     * @param bool $add_dashes add dashes to the password
+     * @param string $available_sets the list of available character sets
+     *
+     * @param resource $db_connection to the database
+     * @param string $user the name of the database
+     *
+     * @return resource result of executing the query
+     *
+     * @since 1.0
+     * @link https://gist.github.com/tylerhall/521810 Original Implementation (public domain)
+     */
+	public static function generate_password($length = 8, $add_dashes = false, $available_sets = 'luds') {
 		$sets = array();
 		if(strpos($available_sets, 'l') !== false)
 			$sets[] = 'abcdefghjkmnpqrstuvwxyz';
