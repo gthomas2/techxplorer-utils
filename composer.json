@@ -1,5 +1,6 @@
 {
 	"require": {
-        "jlogsdon/cli": "dev-master"
+        "jlogsdon/cli": "dev-master",
+        "yzalis/identicon": "1.0.*@dev"
 	}
 }
