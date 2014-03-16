@@ -21,3 +21,4 @@ Documentation on the available scripts is contained in [the wiki](https://github
 These scripts use the following libraries, installed via Composer
 
 1. [php-cli-tools](https://github.com/jlogsdon/php-cli-tools)
+2. [identicon](https://github.com/yzalis/Identicon)
