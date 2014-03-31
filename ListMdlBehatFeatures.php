@@ -59,7 +59,7 @@ class ListMdlBehatFeatures {
     /**
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.0';
+    const SCRIPT_VERSION = 'v1.0.1';
 
     /**
      * defines the uri for more information
@@ -92,7 +92,7 @@ class ListMdlBehatFeatures {
         $arguments->addOption(array('input', 'i'),
             array(
                 'default' => '',
-                'description' => 'Set the path to the behat yaml file'
+                'description' => 'Set the path to the Behat YAML file'
             )
         );
 
@@ -104,6 +104,7 @@ class ListMdlBehatFeatures {
         );
 
         $arguments->addFlag(array('all', 'a'), 'Include all scenarios');
+        $arguments->addFlag(array('verbose', 'v'), 'Output extra information');
         $arguments->addFlag(array('help', 'h'), 'Show this help screen');
 
         // parse the arguments
@@ -148,6 +149,12 @@ class ListMdlBehatFeatures {
         } else {
             \cli\err("%rERROR: %wYou can't use the --exclude and --all arguments at the same time\n");
             die(-1);
+        }
+
+        $verbose = false;
+
+        if($arguments['verbose']) {
+            $verbose = true;
         }
 
         // parse the input file
@@ -256,7 +263,14 @@ class ListMdlBehatFeatures {
                 }
 
                 if(count($elems) != 0) {
-                    $data[$feature->getTitle()] = $elems;
+                    if($verbose) {
+                        $tmp = array();
+                        $tmp['File:'] = array($feature_file->getPathname());
+                        $tmp['Scenarios:'] = $elems;
+                        $elems = $tmp;
+                    }
+
+                    $data['Feature: ' . $feature->getTitle()] = array('Scenarios:' => $elems);
                     $scenario_count += count($elems);
                 }
             }
@@ -269,8 +283,8 @@ class ListMdlBehatFeatures {
         $tree->setRenderer(new \cli\tree\Markdown(2));
         $tree->display();
 		\cli\out("\n");
-		\cli\out("Found features: " . count($data) . "\n");
-		\cli\out("Found scenarios: {$scenario_count}\n");
+		\cli\out("Matching features: " . count($data) . "\n");
+		\cli\out("Matching scenarios: {$scenario_count}\n");
     }
 
 }
