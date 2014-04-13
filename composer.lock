@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "300cda815c8b97a0ce8f4f38008e1d1c",
+    "hash": "e364a75ac0c472e50caa309703c9cfbf",
     "packages": [
         {
             "name": "behat/gherkin",
@@ -64,6 +64,54 @@
                 "parser"
             ],
             "time": "2014-01-31 12:59:28"
+        },
+        {
+            "name": "chobie/jira-api-restclient",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chobie/jira-api-restclient.git",
+                "reference": "4fff79c436908778ddef304d777849fafbeeab5b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chobie/jira-api-restclient/zipball/4fff79c436908778ddef304d777849fafbeeab5b",
+                "reference": "4fff79c436908778ddef304d777849fafbeeab5b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Jira_": "./"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Shuhei Tanuma",
+                    "email": "chobieeee@php.net",
+                    "homepage": "http://blog.stfalcon.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "JIRA REST API.",
+            "keywords": [
+                "api",
+                "jira",
+                "rest"
+            ],
+            "time": "2014-04-11 15:55:33"
         },
         {
             "name": "jlogsdon/cli",
@@ -221,7 +269,8 @@
         "jlogsdon/cli": 20,
         "yzalis/identicon": 20,
         "symfony/yaml": 20,
-        "behat/gherkin": 20
+        "behat/gherkin": 20,
+        "chobie/jira-api-restclient": 20
     },
     "platform": [
 
