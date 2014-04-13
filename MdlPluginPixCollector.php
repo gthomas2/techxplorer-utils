@@ -14,7 +14,7 @@
  * See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Techxplorer's Moodle User List Creator.
+ * along with Techxplorer's Moodle Plugin Pix Collector.
  * If not, see <http://www.gnu.org/licenses/>
  */
 

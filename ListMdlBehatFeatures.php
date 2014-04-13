@@ -1,20 +1,20 @@
 #!/usr/bin/env php
 <?php
 /*
- * This file is part of Techxplorer's List Moodle Behat Features.
+ * This file is part of Techxplorer's List Moodle Behat Features script.
  *
- * Techxplorer's List Moodle Behat Features is free software: you can redistribute
+ * Techxplorer's List Moodle Behat Features script is free software: you can redistribute
  * it and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * Techxplorer's List Moodle Behat Features is distributed in the hope
+ * Techxplorer's List Moodle Behat Features script is distributed in the hope
  * that it will be useful, but WITHOUT ANY WARRANTY; without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Techxplorer's Moodle User List Creator.
+ * along with Techxplorer's List Moodle Behat Features script.
  * If not, see <http://www.gnu.org/licenses/>
  */
 
@@ -31,7 +31,7 @@ use Behat\Gherkin\Node\OutlineNode;
 use Behat\Gherkin\Node\ScenarioNode;
 
 /**
- * Techxplorer's List Moodle Behat Features a php script which can be used
+ * Techxplorer's List Moodle Behat Features script is a php script which can be used
  * to list some details about Moodle Behat features.
  *
  * @since 1.0
@@ -41,7 +41,7 @@ use Behat\Gherkin\Node\ScenarioNode;
  */
 
 /**
- * main driving class of Techxplorer's List Moodle Behat Features
+ * main driving class of Techxplorer's List Moodle Behat Features script
  *
  * @since 1.0
  * @author techxplorer <corey@techxplorer.com>

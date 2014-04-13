@@ -1,20 +1,20 @@
 #!/usr/bin/env php
 <?php
 /*
- * This file is part of Techxplorer's Moodle User List Creator.
+ * This file is part of Techxplorer's Mahara User List Creator script.
  *
- * Techxplorer's Moodle User List Creator is free software: you can redistribute it
+ * Techxplorer's Mahara User List Creator script is free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * Techxplorer's Moodle User List Creator is distributed in the hope that it will
+ * Techxplorer's Moodle User List Creator script is distributed in the hope that it will
  * be useful, but WITHOUT ANY WARRANTY; without even the implied
  * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Techxplorer's Moodle User List Creator.
+ * along with Techxplorer's Mahara User List Creator script.
  * If not, see <http://www.gnu.org/licenses/>
  */
 
@@ -27,7 +27,7 @@ require(__DIR__ . '/vendor/autoload.php');
 
 /**
  * a php script which can be used to create a file of
- * user records for uploading into mahara
+ * user records for uploading into Mahara
  *
  * @since 1.0
  * @author techxplorer <corey@techxplorer.com>
@@ -36,7 +36,7 @@ require(__DIR__ . '/vendor/autoload.php');
  */
 
 /**
- * main driving class of Techxplorer's Mahara User List Creator
+ * main driving class of Techxplorer's Mahara User List Creator script
  *
  * @since 1.0
  * @author techxplorer <corey@techxplorer.com>

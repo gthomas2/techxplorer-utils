@@ -1,20 +1,20 @@
 #!/usr/bin/env php
 <?php
 /*
- * This file is part of Techxplorer's Utility Script Package.
+ * This file is part of Techxplorer's Database Assistant script.
  *
- * Techxplorer's Utility Script Package is free software: you can
+ * Techxplorer's Database Assistant script is free software: you can
  * redistribute it and/or modify it under the terms of the GNU
  * General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * Techxplorer's Utility Script Package is distributed in the hope that
+ * Techxplorer's Database Assistant script is distributed in the hope that
  * it will be useful, but WITHOUT ANY WARRANTY; without even the implied
  * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Techxplorer's Utility Script Package.
+ * along with Techxplorer's Database Assistant script.
  * If not, see <http://www.gnu.org/licenses/>
  */
 
@@ -27,7 +27,7 @@ require(__DIR__ . '/vendor/autoload.php');
 
 /**
  * a php script which can be used to help undertake a variety of
- * repetative database related tasks
+ * repetative database related tasks on a PostgreSQL server
  *
  * @since 1.0
  * @author techxplorer <corey@techxplorer.com>
@@ -36,7 +36,7 @@ require(__DIR__ . '/vendor/autoload.php');
  */
 
 /**
- * main driving class of Techxplorer's Database Assistant
+ * main driving class of Techxplorer's Database Assistant script
  *
  * @since 1.0
  * @author techxplorer <corey@techxplorer.com>
