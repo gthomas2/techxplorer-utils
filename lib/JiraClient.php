@@ -13,7 +13,7 @@
  * See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Techxplorer's Moodle User List Creator.
+ * along with Techxplorer's Utility Scripts.
  * If not, see <http://www.gnu.org/licenses/>
  */
 
@@ -85,6 +85,9 @@ class JiraClient {
 
 	/**
 	 * get a connection to the jira server
+	 *
+	 * @param string $project the JIRA project name
+	 * @param string $version the JIRA project version name
 	 *
 	 * @return mixed array list of issues, or false on failure
 	 *
