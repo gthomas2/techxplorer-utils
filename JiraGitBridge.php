@@ -123,7 +123,12 @@ class JiraGitBridge {
 		// show the help screen if required
 		if($arguments['help']) {
 			\cli\out($arguments->getHelpScreen());
-			\cli\out("\n");
+			\cli\out("\n\n");
+
+			$actions = array();
+			foreach($valid_actions as $key => $value) {
+				$actions[] = array($key, $value);
+			}
 
 			// output the table
 			\cli\out("List of available actions:\n");
