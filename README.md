@@ -21,8 +21,8 @@ Documentation on the available scripts is contained in [the wiki](https://github
 ## Dependencies ##
 These scripts use the following libraries, installed and managed using [Composer](https://getcomposer.org/). 
 
-1. [php-cli-tools](https://github.com/jlogsdon/php-cli-tools)
-2. [identicon](https://github.com/yzalis/Identicon)
+1. [jlogsdon/php-cli-tools](https://github.com/jlogsdon/php-cli-tools)
+2. [yzalis/Identicon](https://github.com/yzalis/Identicon)
 3. [symfony/yaml](https://github.com/symfony/Yaml)
 4. [behat/gherkin](https://github.com/Behat/Gherkin)
 5. [chobie/jira-api-restclient](https://github.com/chobie/jira-api-restclient)
