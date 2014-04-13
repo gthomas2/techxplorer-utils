@@ -23,6 +23,7 @@ error_reporting(E_ALL);
 
 // include the required libraries
 require(__DIR__ . '/vendor/autoload.php');
+require(__DIR__ . '/lib/JiraClient.php');
 
 
 /**
@@ -159,125 +160,6 @@ class JiraListIssues {
 		$table->display();
 
 		\cli\out("Issues found: " . count($rows) . "\n");
-    }
-}
-
-/**
- * main driving class of Techxplorer's User Moodle Pix Creator
- *
- * @since 1.0
- * @author techxplorer <corey@techxplorer.com>
- *
- * @copyright 2013 Corey Wallis (techxplorer)
- * @license http://opensource.org/licenses/GPL-3.0
- */
-class JiraClient {
-
-	/**
-	 * define the default configuration file
-	 */
-	const DEFAULT_CFG_FILE = '/data/jira-list-issues.json.dist';
-
-	/**
-	 * define the configuration override file
-	 */
-	const OVERRIDE_CFG_FILE = '/data/jira-list-issues.json';
-
-	/**
-	 * store the connection details
-	 */
-    private $jira_details = false;
-
-    /**
-     * the JIRA api object
-     */
-    private $jira_client = false;
-
-    /**
-     * load the connection and authentication details
-     *
-     * @return mixed an array of connection related details, or false on failure
-     *
-     * @since 1.0
-     * @author techxplorer <corey@techxplorer.com>
-     */
-	public function load_auth_info() {
-
-		$details = false;
-
-		// start with the override file
-		if(is_readable(__DIR__ . self::OVERRIDE_CFG_FILE)) {
-			$details = json_decode(file_get_contents(__DIR__ . self::OVERRIDE_CFG_FILE), true);
-		}
-
-		// try the default role file
-		if($details == false) {
-			// try the default file
-			if(is_readable(__DIR__ . self::DEFAULT_CFG_FILE)) {
-				$details = json_decode(file_get_contents(__DIR__ . self::DEFAULT_CFG_FILE), true);
-			}
-		}
-
-        if($details == null || $details == false) {
-            return false;
-        } else {
-    		$this->jira_details = $details;
-    		return true;
-        }
-	}
-
-	/**
-	 * get a connection to the jira server
-	 *
-	 * @return mixed array list of issues, or false on failure
-	 *
-     * @since 1.0
-     * @author techxplorer <corey@techxplorer.com>
-     */
-    public function get_issues($project, $version) {
-
-        // check the parameters
-        if(trim($project) === '') {
-            throw new InvalidArgumentException('The project parameter is required');
-        }
-
-        if(trim($version === '')) {
-            throw new InvalidArgumentException('The version parameter is required');
-        }
-
-        // make sure we have details
-        if(!$this->jira_details) {
-            return false;
-        }
-
-        // search jira
-        $api = new Jira_Api(
-           $this->jira_details['url'],
-            new Jira_Api_Authentication_Basic(
-                $this->jira_details['user'],
-                $this->jira_details['password']
-            )
-        );
-
-        // walker object responsible for the search
-        $walker = new Jira_Issues_Walker($api);
-
-        // do the search
-        $walker->push("project = {$project} AND fixVersion = \"{$version}\"");
-
-        $issues = array();
-
-        foreach ($walker as $step) {
-            $issue = array();
-
-            $issue['key'] = $step->getKey();
-            $issue['summary'] = $step->getSummary();
-            $issue['status'] = $step->getStatus()['name'];
-
-            $issues[] = $issue;
-        }
-
-        return $issues;
     }
 }
 
