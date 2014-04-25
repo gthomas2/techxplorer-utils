@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Behat/Gherkin.git",
-                "reference": "3d06dc6657056f94771436ca92b2ff182963e3a1"
+                "reference": "4f094def58f124cf70036a4066bc82cf7a89c5f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Behat/Gherkin/zipball/3d06dc6657056f94771436ca92b2ff182963e3a1",
-                "reference": "3d06dc6657056f94771436ca92b2ff182963e3a1",
+                "url": "https://api.github.com/repos/Behat/Gherkin/zipball/4f094def58f124cf70036a4066bc82cf7a89c5f6",
+                "reference": "4f094def58f124cf70036a4066bc82cf7a89c5f6",
                 "shasum": ""
             },
             "require": {
@@ -63,7 +63,7 @@
                 "gherkin",
                 "parser"
             ],
-            "time": "2014-01-31 12:59:28"
+            "time": "2014-04-20 12:40:15"
         },
         {
             "name": "chobie/jira-api-restclient",
@@ -71,12 +71,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/chobie/jira-api-restclient.git",
-                "reference": "4fff79c436908778ddef304d777849fafbeeab5b"
+                "reference": "320e6bf6b8027748ca5fcf12e306770dc7a94acd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chobie/jira-api-restclient/zipball/4fff79c436908778ddef304d777849fafbeeab5b",
-                "reference": "4fff79c436908778ddef304d777849fafbeeab5b",
+                "url": "https://api.github.com/repos/chobie/jira-api-restclient/zipball/320e6bf6b8027748ca5fcf12e306770dc7a94acd",
+                "reference": "320e6bf6b8027748ca5fcf12e306770dc7a94acd",
                 "shasum": ""
             },
             "require": {
@@ -111,7 +111,7 @@
                 "jira",
                 "rest"
             ],
-            "time": "2014-04-11 15:55:33"
+            "time": "2014-04-15 02:58:08"
         },
         {
             "name": "jlogsdon/cli",
@@ -165,12 +165,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "cee3067d680232674c6505d91db9d3d635a9a8f4"
+                "reference": "e9525fc511a51e7bfa214c6c420515c580fda35a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/cee3067d680232674c6505d91db9d3d635a9a8f4",
-                "reference": "cee3067d680232674c6505d91db9d3d635a9a8f4",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/e9525fc511a51e7bfa214c6c420515c580fda35a",
+                "reference": "e9525fc511a51e7bfa214c6c420515c580fda35a",
                 "shasum": ""
             },
             "require": {
@@ -205,7 +205,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-03-26 11:51:10"
+            "time": "2014-04-18 20:40:13"
         },
         {
             "name": "yzalis/identicon",
