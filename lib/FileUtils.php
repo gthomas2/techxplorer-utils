@@ -91,6 +91,58 @@ class FileUtils
 
         return $path;
     }
+
+    /**
+     * Load a configuration file. Either the default file, or an override file
+     *
+     * @param string $name the name of the config file, excluding extension
+     *
+     * @return array an array of configuration values
+     *
+     * @throws IllegalArgumentException if the argument is not a valid string
+     * @throws FileNotFoundException if the app cannot be found
+     */
+    public static function loadConfig($name)
+    {
+        // store the parsed config
+        $config = null;
+
+        // check the argument
+        if ($name == null || trim($name) == '') {
+            throw new IllegalArgumentException('The $name parameter is required');
+        }
+
+        // build the paths
+        $default_path  = realpath(_DIR__ . '/../data/' . $name . '.json.dist');
+        $override_path = realpath(_DIR__ . '/../data/' . $name . '.json');
+
+        if ($default_path == false && $override_path == false) {
+            throw new FileNotFoundException(
+                $name . '.json.dist and ' . $name . '.json'
+            );
+        }
+
+        // load the override path first
+        if ($override_path != false) {
+            $config = json_decode(file_get_contents($override_path), true);
+
+            // check if it was able to be parsed
+            if ($config != null) {
+                return $config;
+            } else {
+                throw new ConfigParseException($override_path);
+            }
+        } else {
+            $config = json_decode(file_get_contents($default_path), true);
+
+            // check if it was able to be parsed
+            if ($config != null) {
+                return $config;
+            } else {
+                throw new ConfigParseException($default_path);
+            }
+        }
+    }
 }
 
 /**
@@ -105,12 +157,39 @@ class FileUtils
 class FileNotFoundException extends RuntimeException
 {
     /**
-     * Constructor.
+     * Constructor
      *
      * @param string $path The path to the file that was not found
      */
     public function __construct($path)
     {
         parent::__construct(sprintf('The file "%s" does not exist', $path));
+    }
+}
+
+/**
+ * An exception to indicate a config file could not be parsed
+ *
+ * @category TechxplorerUtils
+ * @package  TechxplorerUtils
+ * @author   techxplorer <corey@techxplorer.com>
+ * @license  http://opensource.org/licenses/GPL-3.0 GNU Public License v3.0
+ * @link     https://github.com/techxplorer/techxplorer-utils
+ */
+class ConfigParseException extends RuntimeException
+{
+    /**
+     * Constructor
+     *
+     * @param string $path The path to the file that failed parsing
+     */
+    public function __construct($path)
+    {
+        parent::__construct(
+            sprintf(
+                'The config file "%s" could not be parsed',
+                $path
+            )
+        );
     }
 }
