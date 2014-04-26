@@ -27,9 +27,13 @@
  * @link     https://github.com/techxplorer/techxplorer-utils
  */
 
-use \Techxplorer\Utils\Files as Files;
+namespace Techxplorer\Utils;
+use Techxplorer\Utils\Files as Files;
 use InvalidArgumentException;
 use BadMethodCallException;
+use Jira_Api;
+use Jira_Issues_Walker;
+use Jira_Api_Authentication_Basic;
 
 /**
  * A convenience class to provide a bridge between my code
