@@ -1,54 +1,58 @@
 <?php
-/*
- * This file is part of Techxplorer's Utility Scripts
+/**
+ * This file is part of Techxplorer's Util script library.
  *
- * Techxplorer's Utility Scripts is free software: you can redistribute it
+ * Techxplorer's Util script library is free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * Techxplorer's Utility Scripts is distributed in the hope that it will
+ * Techxplorer's Util script library is distributed in the hope that it will
  * be useful, but WITHOUT ANY WARRANTY; without even the implied
  * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Techxplorer's Utility Scripts.
+ * along with Techxplorer's Util script library.
  * If not, see <http://www.gnu.org/licenses/>
+ *
+ * This is a PHP script which can be used to create a RAM disk on Mac OS X
+ *
+ * PHP version 5
+ *
+ * @category TechxplorerUtils
+ * @package  TechxplorerUtils
+ * @author   techxplorer <corey@techxplorer.com>
+ * @license  http://opensource.org/licenses/GPL-3.0 GNU Public License v3.0
+ * @link     https://github.com/techxplorer/techxplorer-utils
  */
-
 
 /**
- * A convenience class to provide the bridge between my code
- * and the JIRA API classes
+ * A convenience class to provide a bridge between my code
+ * andd the JIRA API classes
  *
- * @since 1.0
- * @author techxplorer <corey@techxplorer.com>
- *
- * @copyright 2013 Corey Wallis (techxplorer)
- * @license http://opensource.org/licenses/GPL-3.0
+ * @category TechxplorerUtils
+ * @package  TechxplorerUtils
+ * @author   techxplorer <corey@techxplorer.com>
+ * @license  http://opensource.org/licenses/GPL-3.0 GNU Public License v3.0
+ * @link     https://github.com/techxplorer/techxplorer-utils
  */
-class JiraClient {
-
-	/**
-	 * define the default configuration file
-	 */
-	const DEFAULT_CFG_FILE = '/../data/jira-list-issues.json.dist';
-
-	/**
-	 * define the configuration override file
-	 */
-	const OVERRIDE_CFG_FILE = '/../data/jira-list-issues.json';
-
-	/**
-	 * store the connection details
-	 */
-    private $jira_details = false;
+class JiraClient
+{
+    /**
+     * define the default configuration file
+     */
+    const DEFAULT_CFG_FILE = '/../data/jira-list-issues.json.dist';
 
     /**
-     * the JIRA api object
+     * define the configuration override file
      */
-    private $jira_client = false;
+    const OVERRIDE_CFG_FILE = '/../data/jira-list-issues.json';
+
+    /**
+     * store the connection details
+     */
+    private $_jira_details = false;
 
     /**
      * load the connection and authentication details
@@ -58,64 +62,65 @@ class JiraClient {
      * @since 1.0
      * @author techxplorer <corey@techxplorer.com>
      */
-	public function load_auth_info() {
+    public function load_auth_info()
+    {
+        $details = false;
 
-		$details = false;
+        // start with the override file
+        if (is_readable(__DIR__ . self::OVERRIDE_CFG_FILE)) {
+            $details = json_decode(file_get_contents(__DIR__ . self::OVERRIDE_CFG_FILE), true);
+        }
 
-		// start with the override file
-		if(is_readable(__DIR__ . self::OVERRIDE_CFG_FILE)) {
-			$details = json_decode(file_get_contents(__DIR__ . self::OVERRIDE_CFG_FILE), true);
-		}
+        // try the default role file
+        if ($details == false) {
+            // try the default file
+            if (is_readable(__DIR__ . self::DEFAULT_CFG_FILE)) {
+                $details = json_decode(file_get_contents(__DIR__ . self::DEFAULT_CFG_FILE), true);
+            }
+        }
 
-		// try the default role file
-		if($details == false) {
-			// try the default file
-			if(is_readable(__DIR__ . self::DEFAULT_CFG_FILE)) {
-				$details = json_decode(file_get_contents(__DIR__ . self::DEFAULT_CFG_FILE), true);
-			}
-		}
-
-        if($details == null || $details == false) {
+        if ($details == null || $details == false) {
             return false;
         } else {
-    		$this->jira_details = $details;
-    		return true;
-        }
-	}
+            $this->_jira_details = $details;
 
-	/**
-	 * get a connection to the jira server
-	 *
-	 * @param string $project the JIRA project name
-	 * @param string $version the JIRA project version name
-	 *
-	 * @return mixed array list of issues, or false on failure
-	 *
+            return true;
+        }
+    }
+
+    /**
+     * get a connection to the jira server
+     *
+     * @param string $project the JIRA project name
+     * @param string $version the JIRA project version name
+     *
+     * @return mixed array list of issues, or false on failure
+     *
      * @since 1.0
      * @author techxplorer <corey@techxplorer.com>
      */
-    public function get_issues($project, $version) {
-
+    public function get_issues($project, $version)
+    {
         // check the parameters
-        if(trim($project) === '') {
+        if (trim($project) === '') {
             throw new InvalidArgumentException('The project parameter is required');
         }
 
-        if(trim($version === '')) {
+        if (trim($version === '')) {
             throw new InvalidArgumentException('The version parameter is required');
         }
 
         // make sure we have details
-        if(!$this->jira_details) {
+        if (!$this->_jira_details) {
             return false;
         }
 
         // search jira
         $api = new Jira_Api(
-           $this->jira_details['url'],
+           $this->_jira_details['url'],
             new Jira_Api_Authentication_Basic(
-                $this->jira_details['user'],
-                $this->jira_details['password']
+                $this->_jira_details['user'],
+                $this->_jira_details['password']
             )
         );
 
