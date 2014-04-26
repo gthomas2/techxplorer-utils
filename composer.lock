@@ -3,20 +3,20 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "e364a75ac0c472e50caa309703c9cfbf",
+    "hash": "efe8d47c53b683ebdefa46d253d211e9",
     "packages": [
         {
             "name": "behat/gherkin",
-            "version": "dev-master",
+            "version": "v4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Behat/Gherkin.git",
-                "reference": "4f094def58f124cf70036a4066bc82cf7a89c5f6"
+                "reference": "5898721f460b91907ba1a841f9198b99ec278ad1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Behat/Gherkin/zipball/4f094def58f124cf70036a4066bc82cf7a89c5f6",
-                "reference": "4f094def58f124cf70036a4066bc82cf7a89c5f6",
+                "url": "https://api.github.com/repos/Behat/Gherkin/zipball/5898721f460b91907ba1a841f9198b99ec278ad1",
+                "reference": "5898721f460b91907ba1a841f9198b99ec278ad1",
                 "shasum": ""
             },
             "require": {
@@ -63,7 +63,7 @@
                 "gherkin",
                 "parser"
             ],
-            "time": "2014-04-20 12:40:15"
+            "time": "2014-01-05 15:28:02"
         },
         {
             "name": "chobie/jira-api-restclient",

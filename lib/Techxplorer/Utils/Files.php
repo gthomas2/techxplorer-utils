@@ -27,6 +27,8 @@
  * @link     https://github.com/techxplorer/techxplorer-utils
  */
 
+namespace Techxplorer\Utils;
+
 /**
  * A class of file, and file system, related utility methods
  *
@@ -36,7 +38,7 @@
  * @license  http://opensource.org/licenses/GPL-3.0 GNU Public License v3.0
  * @link     https://github.com/techxplorer/techxplorer-utils
  */
-class FileUtils
+class Files
 {
     /**
      * format a file size from byte count to human readable format
@@ -154,7 +156,7 @@ class FileUtils
  * @license  http://opensource.org/licenses/GPL-3.0 GNU Public License v3.0
  * @link     https://github.com/techxplorer/techxplorer-utils
  */
-class FileNotFoundException extends RuntimeException
+class FileNotFoundException extends \RuntimeException
 {
     /**
      * Constructor
@@ -176,7 +178,7 @@ class FileNotFoundException extends RuntimeException
  * @license  http://opensource.org/licenses/GPL-3.0 GNU Public License v3.0
  * @link     https://github.com/techxplorer/techxplorer-utils
  */
-class ConfigParseException extends RuntimeException
+class ConfigParseException extends \RuntimeException
 {
     /**
      * Constructor

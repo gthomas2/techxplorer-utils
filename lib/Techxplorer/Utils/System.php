@@ -27,6 +27,8 @@
  * @link     https://github.com/techxplorer/techxplorer-utils
  */
 
+namespace Techxplorer\Utils;
+
 /**
  * A class of system and OS  related utility methods
  *
@@ -36,7 +38,7 @@
  * @license  http://opensource.org/licenses/GPL-3.0 GNU Public License v3.0
  * @link     https://github.com/techxplorer/techxplorer-utils
  */
-class SysUtils
+class System
 {
     /**
      * Determine if the server operating system is Mac OS X
