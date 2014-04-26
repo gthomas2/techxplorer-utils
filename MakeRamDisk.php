@@ -32,8 +32,14 @@
 error_reporting(E_ALL);
 
 // include the required libraries
-require __DIR__ . '/vendor/autoload.php';
-require __DIR__ . '/lib/FileUtils.php';
+require_once __DIR__ . '/vendor/autoload.php';
+
+// shorten namespaces
+use \Techxplorer\Utils\Files as Files;
+use \Techxplorer\Utils\System as System;
+
+use \Techxplorer\Utils\FileNotFoundException;
+use \Techxplorer\Utils\ConfigParseException;
 
 /**
  * Main driving class of the script
@@ -69,14 +75,9 @@ class MakeRamDisk
     const LICENSE_URI = 'http://opensource.org/licenses/GPL-3.0';
 
     /**
-     * defines the default RAM disk name
+     * defines the default configuration file name
      */
-    const DEFAULT_NAME = 'RAM Disk';
-
-    /**
-     * defines the default size in MB
-     */
-    const DEFAULT_SIZE = 1024;
+    const DEFAULT_CONFIG_FILE = 'make-ram-disk.json';
 
     /**
      * main driving function
@@ -89,13 +90,33 @@ class MakeRamDisk
         \cli\out(self::SCRIPT_NAME . ' - ' . self::SCRIPT_VERSION . "\n");
         \cli\out('License: ' . self::LICENSE_URI . "\n\n");
 
+        // read in the default config
+        try {
+            $config_path = __DIR__ . '/data/' . self::DEFAULT_CONFIG_FILE;
+            $config = Files::loadConfig($config_path);
+        } catch (FileNotFoundException $ex) {
+            \cli\err(
+                "%rERROR: %wUnable to find configuration file:\n" .
+                $config_path . 
+                "\n"
+            );
+            die(1);
+        } catch (ConfigParseException $ex) {
+            \cli\err(
+                "%rERROR: %wUnable to load configuration file:\n" . 
+                $config_path . 
+                "\n"
+            );
+            die(1);
+        }
+
         // prepare arguments
         $arguments = new \cli\Arguments($_SERVER['argv']);
 
         $arguments->addOption(
             array('name', 'n'),
             array(
-                'default' => self::DEFAULT_NAME,
+                'default' => $config['name'],
                 'description' => 'The name of the new RAM disk'
             )
         );
@@ -103,7 +124,7 @@ class MakeRamDisk
         $arguments->addOption(
             array('size', 's'),
             array(
-                'default' => self::DEFAULT_SIZE,
+                'default' => $config['size'],
                 'description' => 'The size of the new RAM disk in MB'
             )
         );
@@ -118,8 +139,8 @@ class MakeRamDisk
             die(0);
         }
 
-        $disk_name = self::DEFAULT_NAME;
-        $disk_size = self::DEFAULT_SIZE;
+        $disk_name = $config['name'];
+        $disk_size = $config['size'];
 
         if ($arguments['name']) {
             $disk_name = $arguments['name'];
@@ -144,7 +165,7 @@ class MakeRamDisk
         \cli\out("INFO: using disk name: $disk_name\n");
         \cli\out(
             "INFO: using disk size: " .
-            FileUtils::humanReadableSize($disk_size * 1024 * 1024) .
+            Files::humanReadableSize($disk_size * 1024 * 1024) .
             "\n"
         );
 
@@ -153,16 +174,16 @@ class MakeRamDisk
 
         // find the necessary apps
         try {
-            $diskutil_path = FileUtils::findApp('diskutil');
+            $diskutil_path = Files::findApp('diskutil');
         } catch (FileNotFoundException $ex) {
-            \cli\err("%rERROR: %wthe 'diskutil' app could not be found.\n");
+            \cli\err("%rERROR: %w" . $ex->getMessage() . "\n");
             die(-1);
         }
 
         try {
-            $hdiutil_path = FileUtils::findApp('hdiutil');
+            $hdiutil_path = Files::findApp('hdiutil');
         } catch (FileNotFoundException $ex) {
-            \cli\err("%rERROR: %wthe 'hdiutil' app could not be found.\n");
+            \cli\err("%rERROR: %w" . $ex->getMessage() . "\n");
             die(-1);
         }
 
@@ -186,7 +207,6 @@ class MakeRamDisk
         $volume_id = $output[0];
 
         // make the file system
-        // diskutil erasevolume HFS+ 'RAM Disk'
         $command = escapeshellcmd(
             $diskutil_path . 
             " erasevolume HFS+ '$disk_name' $volume_id"
@@ -213,12 +233,11 @@ class MakeRamDisk
     }
 }
 
-// make sure script is only run on the cli
-if (substr(php_sapi_name(), 0, 3) == 'cli') {
-    // yes
+// Make sure the script is run only
+// on Mac OS X and the CLI
+if (!System::isMacOSX() || !System::isOnCLI()) {
+    die("This script can only be run on the CLI on Mac OS X");
+} else {
     $app = new MakeRamDisk();
     $app->doTask();
-} else {
-    // no
-    die("This script can only be run on the cli\n");
 }
