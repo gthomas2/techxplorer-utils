@@ -1,0 +1,6 @@
+{
+   "host" : "localhost",
+   "user" : "techxplorer",
+   "database" : "postgres",
+   "password" : ""
+}

@@ -28,6 +28,7 @@
  */
 
 namespace Techxplorer\Utils;
+use InvalidArgumentException;
 
 /**
  * A class of file, and file system, related utility methods
@@ -48,7 +49,7 @@ class Files
      *
      * @return string the file size in a human readable format
      *
-     * @throws IllegalArgumentException if either argument is not an integer
+     * @throws InvalidArgumentException if either argument is not an integer
      *
      * @link http://jeffreysambells.com/2012/10/25/human-readable-filesize-php
      */
@@ -56,7 +57,7 @@ class Files
     {
         // check the arguments
         if (!is_int($bytes) || !is_int($decimals)) {
-            throw new IllegalArgumentException(
+            throw new InvalidArgumentException(
                 'The $bytes and $decimals parameters must be integers'
             );
         }
@@ -73,14 +74,14 @@ class Files
      *
      * @return string the path to the command line application
      *
-     * @throws IllegalArgumentException if the argument is not a valid string
+     * @throws InvalidArgumentException if the argument is not a valid string
      * @throws FileNotFoundException if the app cannot be found
      */
     public static function findApp($name)
     {
         // check the argument
         if ($name == null || trim($name) == '') {
-            throw new IllegalArgumentException('The $name parameter is required');
+            throw new InvalidArgumentException('The $name parameter is required');
         }
 
         // find the application
@@ -88,7 +89,7 @@ class Files
         $path = trim(shell_exec($command));
 
         if ($path == null || $path == '') {
-            throw new FileNotFoundException($path);
+            throw new FileNotFoundException($name);
         }
 
         return $path;
@@ -97,31 +98,29 @@ class Files
     /**
      * Load a configuration file. Either the default file, or an override file
      *
-     * @param string $name the name of the config file, excluding extension
+     * @param string $path the name of the config file
      *
      * @return array an array of configuration values
      *
-     * @throws IllegalArgumentException if the argument is not a valid string
+     * @throws InvalidArgumentException if the argument is not a valid string
      * @throws FileNotFoundException if the app cannot be found
      */
-    public static function loadConfig($name)
+    public static function loadConfig($path)
     {
         // store the parsed config
         $config = null;
 
         // check the argument
-        if ($name == null || trim($name) == '') {
-            throw new IllegalArgumentException('The $name parameter is required');
+        if ($path == null || trim($path) == '') {
+            throw new InvalidArgumentException('The $path parameter is required');
         }
 
         // build the paths
-        $default_path  = realpath(_DIR__ . '/../data/' . $name . '.json.dist');
-        $override_path = realpath(_DIR__ . '/../data/' . $name . '.json');
+        $default_path  = realpath($path . '.dist');
+        $override_path = realpath($path);
 
         if ($default_path == false && $override_path == false) {
-            throw new FileNotFoundException(
-                $name . '.json.dist and ' . $name . '.json'
-            );
+            throw new FileNotFoundException($path);
         }
 
         // load the override path first
@@ -165,7 +164,12 @@ class FileNotFoundException extends \RuntimeException
      */
     public function __construct($path)
     {
-        parent::__construct(sprintf('The file "%s" does not exist', $path));
+        parent::__construct(
+            sprintf(
+                'The file "%s" does not exist',
+                $path
+            )
+        );
     }
 }
 
