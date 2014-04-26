@@ -168,6 +168,18 @@ class FilesTests extends PHPUnit_Framework_TestCase
             $config, 
             Files::loadConfig($CFG->data_root . '/make-ram-disk.json.dist')
         );
+
+        $config = array(
+            'url'      => 'https://your-jira-server.lan',
+            'user'     => 'your-user',
+            'password' => 'your-password',
+        );
+
+        $this->assertEquals(
+            $config, 
+            Files::loadConfig($CFG->data_root . '/jira-list-issues.json')
+        );
+
     }
 
     /**
