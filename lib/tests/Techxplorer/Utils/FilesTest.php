@@ -233,4 +233,56 @@ class FilesTests extends PHPUnit_Framework_TestCase
 
         Files::loadConfig('');
     }
+
+    /**
+     * Test the convertSize function
+     *
+     * @return void
+     */
+    public function testConvertSizeOne() {
+
+        // basic sizes in the denominations supported
+        $this->assertEquals(1024, Files::convertSize('1KB'));
+        $this->assertEquals(1048576, Files::convertSize('1MB'));
+        $this->assertEquals(1073741824, Files::convertSize('1GB'));
+
+        // more than one unit
+        $this->assertEquals(1048576 * 10, Files::convertSize('10MB'));
+
+        // a fractional unit
+        $this->assertEquals(1048576 * 5.5, Files::convertSize('5.5MB'));
+
+        // lower case
+        $this->assertEquals(1024, Files::convertSize('1kb'));
+    }
+
+    /**
+     * Test the convertSize function
+     *
+     * @expectedException InvalidArgumentException
+     */
+    public function testConvertSizeTwo() {
+        // empty string
+        Files::convertSize('');
+    }
+
+    /** 
+     * Test the convertSize function
+     *
+     * @expectedException InvalidArgumentException
+     */
+    public function testConvertSizeThree() {
+        // invalid string
+        Files::convertSize('foo');
+    }
+
+    /** 
+     * Test the convertSize function
+     *
+     * @expectedException InvalidArgumentException
+     */
+    public function testConvertSizeFour() {
+        // unrecognised string
+        Files::convertSize('1TB');
+    } 
 }

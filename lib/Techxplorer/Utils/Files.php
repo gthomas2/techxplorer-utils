@@ -142,6 +142,39 @@ class Files
             }
         }
     }
+
+    /**
+     * Convert a file size from human readable format to byte count
+     *
+     * @param string $value the value to convert
+     *
+     * @return int the converted size in bytes
+     *
+     * @throws InvalidArgumentException if the argument is not a valid format
+     */
+    public static function convertSize($value)
+    {
+        // check the argument
+        if ($value == null || trim($value) == '') {
+            throw new InvalidArgumentException('The $value parameter is required');
+        }
+
+        // convert the size
+        $value = strtoupper($value);
+
+        // list the valid units
+        $units = array('KB', 'MB', 'GB');
+
+        // loop through looking for a matching unit
+        foreach ($units as $i => $unit) {
+            if ($unit == substr($value, -2)) {
+                return $value * pow(1024, $i + 1);
+            }
+        }
+
+        // if we get this far, the string didn't parse
+        throw new InvalidArgumentException('The $value could not be parsed');
+    }
 }
 
 /**
