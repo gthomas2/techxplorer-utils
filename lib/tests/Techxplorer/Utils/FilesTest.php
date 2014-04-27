@@ -28,12 +28,12 @@
 use Techxplorer\Utils\Files as Files;
 
 /**
- * Test the File class
+ * Test the Files class
  *
  * @category TechxplorerUtils-Tests
  * @package  TechxplorerUtils-Tests
  * @author   techxplorer <corey@techxplorer.com>
- * @license  http://opensource.org/licenses/GPL-3.0 GNU Public License v3.0
+ * @license  http://www.gnu.org/copyleft/gpl.html GNU Public License v3.0
  * @link     https://github.com/techxplorer/techxplorer-utils
  */
 class FilesTests extends PHPUnit_Framework_TestCase
