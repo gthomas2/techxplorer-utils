@@ -1,31 +1,32 @@
 #!/usr/bin/env php 
 <?php
 /**
- * This file is part of Techxplorer's Jira Git Bridge script.
+ * This file is part of Techxplorer's Utility Scripts.
  *
- * Techxplorer's Jira Git Bridge script is free software: you can redistribute it
- * and/or modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
+ * Techxplorer's Utility Scripts is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the 
  * License, or (at your option) any later version.
  *
- * Techxplorer's Jira Git Bridge script is distributed in the hope that it will
+ * Techxplorer's Utility Scripts is distributed in the hope that it will
  * be useful, but WITHOUT ANY WARRANTY; without even the implied
  * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Techxplorer's Jira Git Bridge script.
+ * along with Techxplorer's Utility Scripts.
  * If not, see <http://www.gnu.org/licenses/>
  *
- * This is a PHP script which can be used retrieve find items
- * in a Git repository using JIRA codes
+ * This is a PHP script which can be used to find commits in a Git 
+ * repository that are related to issues in JIRA for a specific project
+ * and version
  *
- * PHP version 5
+ * PHP Version 5.4 
  *
  * @category TechxplorerUtils
  * @package  TechxplorerUtils
  * @author   techxplorer <corey@techxplorer.com>
- * @license  http://opensource.org/licenses/GPL-3.0 GNU Public License v3.0
+ * @license  http://www.gnu.org/copyleft/gpl.html GNU General Public License
  * @link     https://github.com/techxplorer/techxplorer-utils
  */
 
@@ -49,10 +50,10 @@ use \Techxplorer\Utils\ConfigParseException;
  * @category TechxplorerUtils
  * @package  TechxplorerUtils
  * @author   techxplorer <corey@techxplorer.com>
- * @license  http://opensource.org/licenses/GPL-3.0 GNU Public License v3.0
+ * @license  http://www.gnu.org/copyleft/gpl.html GNU General Public License
  * @link     https://github.com/techxplorer/techxplorer-utils
  *
-  */
+ */
 class JiraGitBridge
 {
     /**
@@ -73,7 +74,7 @@ class JiraGitBridge
     /**
      * defines the license uri
      */
-    const LICENSE_URI = 'http://opensource.org/licenses/GPL-3.0';
+    const LICENSE_URI = 'http://www.gnu.org/copyleft/gpl.html';
 
     /**
      * main driving function
