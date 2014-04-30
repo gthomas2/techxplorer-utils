@@ -255,7 +255,7 @@ class DbAssist
      */
     public static function doActionCreate($arguments, $pg_details)
     {
-        list($user, $database, $password) = DbAssist::get_arguments($arguments);
+        list($user, $database, $password) = DbAssist::getArguments($arguments);
 
         \cli\out(
             "Attempting to create a database with the following settings\n"
@@ -343,7 +343,7 @@ class DbAssist
      */
     public static function doActionEmpty($arguments, $pg_details)
     {
-        list($user, $database) = DbAssist::get_arguments($arguments);
+        list($user, $database) = DbAssist::getArguments($arguments);
 
         \cli\out("Attempting to empty a database with the following settings\n");
         $table = new \cli\Table();
@@ -430,7 +430,7 @@ class DbAssist
      */
     public static function doActionDelete($arguments, $pg_details)
     {
-        list($user, $database) = DbAssist::get_arguments($arguments);
+        list($user, $database) = DbAssist::getArguments($arguments);
 
         \cli\out(
             "Attempting to delete the following database and user\n"
