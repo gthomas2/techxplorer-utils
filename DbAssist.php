@@ -37,6 +37,7 @@ require __DIR__ . '/vendor/autoload.php';
 // shorten namespaces
 use \Techxplorer\Utils\Files as Files;
 use \Techxplorer\Utils\System as System;
+use \Techxplorer\Utils\Password as Password;
 
 use \Techxplorer\Utils\FileNotFoundException;
 use \Techxplorer\Utils\ConfigParseException;
@@ -236,7 +237,7 @@ class DbAssist
         }
 
         if (!$arguments['password']) {
-            $password = DbAssist::generatePassword();
+            $password = Password::generate();
         } else {
             $password = $arguments['password'];
         }
@@ -493,7 +494,7 @@ class DbAssist
         }
 
         // drop the existing user
-        $result = DbAssist::dropUer($db_connection, $user);
+        $result = DbAssist::dropUser($db_connection, $user);
 
         if (!$result) {
             \cli\err("Error: Unable to delete the existing user\n");
@@ -750,74 +751,6 @@ ORDER by u.usename";
             ' password=' .
             $pg_details['password']
         );
-    }
-
-    /**
-     * generate a password
-     *
-     * TODO migrate into a library
-     *
-     * @param integer $length         the length of the dabase
-     * @param bool    $add_dashes     add dashes to the password
-     * @param string  $available_sets the list of available character sets
-     *
-     * @return string the generated password
-     *
-     * @link https://gist.github.com/tylerhall/521810 Original Implementation
-     */
-    public static function generatePassword(
-        $length = 8, 
-        $add_dashes = false, 
-        $available_sets = 'luds'
-    ) {
-        $sets = array();
-
-        if (strpos($available_sets, 'l') !== false) {
-            $sets[] = 'abcdefghjkmnpqrstuvwxyz';
-        }
-
-        if (strpos($available_sets, 'u') !== false) {
-            $sets[] = 'ABCDEFGHJKMNPQRSTUVWXYZ';
-        }
-
-        if (strpos($available_sets, 'd') !== false) {
-            $sets[] = '23456789';
-        }
-
-        if (strpos($available_sets, 's') !== false) {
-            $sets[] = '!@#$&*?';
-        }
-
-        $all = '';
-        $password = '';
-
-        foreach ($sets as $set) {
-            $password .= $set[array_rand(str_split($set))];
-            $all .= $set;
-        }
-
-        $all = str_split($all);
-
-        for ($i = 0; $i < $length - count($sets); $i++) {
-            $password .= $all[array_rand($all)];
-        }
-
-        $password = str_shuffle($password);
-
-        if (!$add_dashes) {
-            return $password;
-        }
-
-        $dash_len = floor(sqrt($length));
-        $dash_str = '';
-
-        while (strlen($password) > $dash_len) {
-            $dash_str .= substr($password, 0, $dash_len) . '-';
-            $password = substr($password, $dash_len);
-        }
-        $dash_str .= $password;
-
-        return $dash_str;
     }
 }
 
