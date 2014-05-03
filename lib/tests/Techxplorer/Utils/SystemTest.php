@@ -36,7 +36,7 @@ use Techxplorer\Utils\System as System;
  * @license  http://www.gnu.org/copyleft/gpl.html GNU General Public License 
  * @link     https://github.com/techxplorer/techxplorer-utils
  */
-class SystemTests extends PHPUnit_Framework_TestCase
+class SystemTest extends PHPUnit_Framework_TestCase
 {
 
     /**
