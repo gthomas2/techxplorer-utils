@@ -6,7 +6,7 @@ If you find these scripts useful please [let me know](https://github.com/techxpl
 ## Supported Platforms ##
 These scripts have been developed and tested on [OS X](http://en.wikipedia.org/wiki/OS_X) and as such should work for other [Unix](http://en.wikipedia.org/wiki/Unix)/[Linux](http://en.wikipedia.org/wiki/Linux) like operating systems. 
 
-If you're working on [Microsoft Windows](http://en.wikipedia.org/wiki/Microsoft_Windows) they're likely to not work. 
+If you're working on [Microsoft Windows](http://en.wikipedia.org/wiki/Microsoft_Windows) they're likely to not work. Indeed some will not work due to operating system dependencies. 
 
 ## Installation ##
 1. Clone the repository or download the ZIP file
@@ -31,6 +31,6 @@ My thanks to the authors of, and contributors to, these libraries. My own develo
 
 ## License ##
 
-Techxplorer's Utility Scripts are free software: you can redistribute them and/or modify them under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Techxplorer's Utility Scripts is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-Techxplorer's Utility Scripts are distributed in the hope that they will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+Techxplorer's Utility Scripts is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html) for more details.
