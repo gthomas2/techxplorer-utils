@@ -39,6 +39,7 @@ require __DIR__ . '/vendor/autoload.php';
 // shorten namespaces
 use \Techxplorer\Utils\Files as Files;
 use \Techxplorer\Utils\System as System;
+use \Techxplorer\Utils\Password as Password;
 
 use \Techxplorer\Utils\FileNotFoundException;
 use \Techxplorer\Utils\ConfigParseException;
@@ -174,7 +175,7 @@ class MdlUserListCreator
 
         // load the role data
         try {
-            $role_path = __DIR__ . '/data/' . self::DEFAULT_CONFIG_FILE;
+            $role_path = __DIR__ . '/data/' . self::ROLES_FILE;
             $role_defs = Files::loadConfig($role_path);
 
             $role_defs = array_map('strtolower', $role_defs);
@@ -294,7 +295,7 @@ class MdlUserListCreator
                         "ERROR: Un-recognised role id " . 
                         "'{$arguments['role']}'\n"
                     );
-                    die(-1);
+                    die(1);
                 }
 
                 $role = $arguments['role'];
@@ -304,17 +305,17 @@ class MdlUserListCreator
         // check to make sure we can access the data files
         if (!is_readable(__DIR__ . self::MALE_DATA_PATH)) {
             \cli\err("ERROR: Unable to access the male name data file\n");
-            die(-1);
+            die(1);
         }
 
         if (!is_readable(__DIR__ . self::FEMALE_DATA_PATH)) {
             \cli\err("ERROR: Unable to access the female name data file\n");
-            die(-1);
+            die(1);
         }
 
         if (!is_readable(__DIR__ . self::LAST_NAME_DATA_PATH)) {
             \cli\err("ERROR: Unable to access the last name data file\n");
-            die(-1);
+            die(1);
         }
 
         // read in the data files
@@ -322,21 +323,21 @@ class MdlUserListCreator
 
         if ($male_data == false) {
             \cli\err("ERROR: Unable to read the male name data file\n");
-            die(-1);
+            die(1);
         }
 
         $female_data = $this->_getData(__DIR__ . self::FEMALE_DATA_PATH);
 
         if ($female_data == false) {
             \cli\err("ERROR: Unable to read the female name data file\n");
-            die(-1);
+            die(1);
         }
 
         $surname_data = $this->_getData(__DIR__ . self::LAST_NAME_DATA_PATH);
 
         if ($surname_data == false) {
             \cli\err("ERROR: Unable to read the female name data file\n");
-            die(-1);
+            die(1);
         }
 
         // get the size of the arrays for use later
@@ -385,7 +386,7 @@ class MdlUserListCreator
                     if ($role !== false) {
                         $user_records[$user_name] = array(
                             $user_name,
-                            $this->generate_password(),
+                            Password::generate(),
                             $first_name,
                             $surname,
                             $email_address,
@@ -395,7 +396,7 @@ class MdlUserListCreator
                     } else {
                         $user_records[$user_name] = array(
                             $user_name,
-                            $this->generate_password(),
+                            Password::generate(),
                             $first_name,
                             $surname,
                             $email_address,
@@ -405,7 +406,7 @@ class MdlUserListCreator
                 } else {
                     $user_records[$user_name] = array(
                         $user_name,
-                        $this->generate_password(),
+                        Password::generate(),
                         $first_name,
                         $surname,
                         $email_address
@@ -484,74 +485,6 @@ class MdlUserListCreator
         } else {
             return false;
         }
-    }
-
-    /** 
-     * generate a password
-     *
-     * TODO migrate into a library
-     *
-     * @param integer $length         the length of the dabase
-     * @param bool    $add_dashes     add dashes to the password
-     * @param string  $available_sets the list of available character sets
-     *
-     * @return string the generated password
-     *
-     * @link https://gist.github.com/tylerhall/521810 Original Implementation
-     */
-    public static function generatePassword(
-        $length = 8,  
-        $add_dashes = false, 
-        $available_sets = 'luds'
-    ) { 
-        $sets = array();
-
-        if (strpos($available_sets, 'l') !== false) {
-            $sets[] = 'abcdefghjkmnpqrstuvwxyz';
-        }   
-
-        if (strpos($available_sets, 'u') !== false) {
-            $sets[] = 'ABCDEFGHJKMNPQRSTUVWXYZ';
-        }   
-
-        if (strpos($available_sets, 'd') !== false) {
-            $sets[] = '23456789';
-        }   
-
-        if (strpos($available_sets, 's') !== false) {
-            $sets[] = '!@#$&*?';
-        }   
-
-        $all = ''; 
-        $password = ''; 
-
-        foreach ($sets as $set) {
-            $password .= $set[array_rand(str_split($set))];
-            $all .= $set;
-        }
-
-        $all = str_split($all);
-
-        for ($i = 0; $i < $length - count($sets); $i++) {
-            $password .= $all[array_rand($all)];
-        }
-
-        $password = str_shuffle($password);
-
-        if (!$add_dashes) {
-            return $password;
-        }
-
-        $dash_len = floor(sqrt($length));
-        $dash_str = '';
-
-        while (strlen($password) > $dash_len) {
-            $dash_str .= substr($password, 0, $dash_len) . '-';
-            $password = substr($password, $dash_len);
-        }
-        $dash_str .= $password;
-
-        return $dash_str;
     }
 }
 
