@@ -4,7 +4,8 @@
         "yzalis/identicon": "1.0.*@dev",
         "symfony/yaml": "2.5.*@dev",
         "behat/gherkin": "4.0.*@dev",
-        "chobie/jira-api-restclient": "1.0.*@dev"
+        "chobie/jira-api-restclient": "1.0.*@dev",
+        "rodneyrehm/plist": "dev-master"
 	},
     "autoload": {
         "psr-0": {"Techxplorer": "lib/"}

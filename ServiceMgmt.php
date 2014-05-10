@@ -42,6 +42,8 @@ use \Techxplorer\Utils\System as System;
 use \Techxplorer\Utils\FileNotFoundException;
 use \Techxplorer\Utils\ConfigParseException;
 
+use \CFPropertyList\CFPropertyList as CFPropertyList;
+
 /**
  * Main driving class of the script
  *
@@ -115,7 +117,8 @@ class ServiceMgmt
         $valid_actions = array(
             'start'   => 'Start services',
             'stop'    => 'Stop services',
-            'restart' => 'Restart services'
+            'restart' => 'Restart services',
+            'status'  => 'Print service status info'
         );
 
         // prepare arguments
@@ -124,7 +127,7 @@ class ServiceMgmt
         $arguments->addOption(
             array('action', 'a'),
             array(
-                'default' => '',
+                'default' => 'status',
                 'description' => 'The action to undertake'
             )
         );
@@ -151,19 +154,18 @@ class ServiceMgmt
             die(0);
         }
 
-        if (!$arguments['action']) {
-            \cli\err("%rERROR: %wMissing 'action' command line option\n");
-            die(1);
-        } else {
+        $action = 'status';
+
+        if ($arguments['action']) {
             $actions = array_keys($valid_actions);
 
             if (!in_array($arguments['action'], $actions)) {
                 \cli\err("%rERROR: %wUnkown action '{$arguments['action']}'\n");
                 die(1);
             }
-        }
 
-        $action = $arguments['action'];
+            $action = $arguments['action'];
+        }
 
         // find the launchctl app
         try {
@@ -239,6 +241,14 @@ class ServiceMgmt
                 );
             }
             break;
+        case 'status':
+            // report some status information
+            $status = $this->_servicesStatus(
+                $launchctl_path,
+                $agents_path,
+                $config
+            );
+            break;
         default:
             // we should not get here
             throw new RuntimeException('Unknown action slipped through validation');
@@ -253,8 +263,6 @@ class ServiceMgmt
      * @param array  $services     the list of services to stop
      *
      * @return bool true on alll services stopped, false if not
-     *
-     * @return void
      */
     private function _stopServices($launchctl, $launchagents, $services)
     {
@@ -315,7 +323,7 @@ class ServiceMgmt
 
         $warnings = false;
 
-        // Loop through the services and stop them
+        // Loop through the services and start them
         foreach ($services as $name => $plist) {
 
             $output = null;
@@ -350,6 +358,95 @@ class ServiceMgmt
         return !$warnings;
     }
 
+    /**
+     * Attempt to list status information for each service
+     *
+     * @param string $launchctl    the path to the launchctl app
+     * @param string $launchagents the path to the launchagents directory
+     * @param array  $services     the list of services to stop
+     *
+     * @return void
+     */
+    private function _servicesStatus($launchctl, $launchagents, $services)
+    {
+        \cli\out("Investigating services...\n");
+
+        $statuses = array();
+        $headers  = array('Name', 'Status', 'PID'); 
+
+        // suppress xml errors and use exception instead
+        libxml_use_internal_errors(true);
+
+        // loop through the list of services
+        foreach ($services as $name => $plist) {
+
+            // read info from plist file
+            try {
+                $plist_info = new CFPropertyList(
+                    "$launchagents/$plist",
+                    CFPropertyList::FORMAT_XML
+                );
+            } catch (\IOException $ex) {
+                \cli\err("%rERROR: %wUnable to read file: $launchagents/$plist");
+                die(1);
+            }
+
+            // get the label from the plist
+            $plist_array = $plist_info->toArray();
+
+            if (!array_key_exists('Label', $plist_array)) {
+                \cli\err(
+                    "%rERROR: %wUnable to find label element in file: " .
+                    $launchagents/$plist
+                );
+                die(1);
+            }
+
+            $plist_label = $plist_array['Label']; 
+
+            // use the label to get info with launchctl
+            $output = null;
+            $return_var = null;
+
+            // build the command to exec
+            $command = "$launchctl list -x $plist_label";
+            $command = escapeshellcmd($command) . " 2>&1";
+
+            // exec command
+            exec(
+                $command,
+                $output,
+                $return_var
+            );
+
+            // put the output back together and parse it
+            $plist_output = implode("\n", $output);
+
+            try {
+                $status_plist = new CFPropertyList();
+                $status_plist->parse($plist_output, CFPropertyList::FORMAT_XML);
+                $status_plist = $status_plist->toArray();
+            } catch (DOMException $ex) {
+                // service is not running
+                $statuses[] = array($name, '%rNot Running%w', '');
+                continue;
+            }
+
+            // see if the PID element exists
+            if (array_key_exists('PID', $status_plist)) {
+                $statuses[] = array($name, '%gRunning:%w', $status_plist['PID']);
+            } else {
+                $statuses[] = array($name, '%rNot Running%w', '');
+            }
+
+        }
+       
+        // output the status info
+        $table = new \cli\Table();
+        $table->setHeaders($headers);
+        $table->setRows($statuses);
+        $table->display();
+    }
 }
 
 // Make sure the script is run only
