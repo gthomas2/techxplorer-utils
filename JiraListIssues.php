@@ -124,14 +124,14 @@ class JiraListIssues
             \cli\err("%rERROR: %wMissing required argument --project\n");
             \cli\err($arguments->getHelpScreen());
             \cli\err("\n");
-            die(-1);
+            die(1);
         }
 
         if (!$arguments['version']) {
             \cli\err("%rERROR: %wMissing required argument --version\n");
             \cli\err($arguments->getHelpScreen());
             \cli\err("\n");
-            die(-1);
+            die(1);
         }
 
         $jira_project = trim($arguments['project']);
