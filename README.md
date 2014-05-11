@@ -1,12 +1,14 @@
 # Techxplorer's Utility Scripts #
-This repository contains a variety of scripts that I have developed  in the course of my work at [NetSpot](http://netspot.com.au/). The scripts are written in [PHP](http://en.wikipedia.org/wiki/PHP), which is the language I work in the most. They are published here in the hope that they prove useful to others. 
+This repository contains a variety of scripts, that I have developed and maintain in my own time, while working for [NetSpot](http://netspot.com.au/). The scripts are written in [PHP](http://en.wikipedia.org/wiki/PHP), which is the programming language I work in the most. They are published here in the hope that they prove useful to others. 
 
-If you find these scripts useful please [let me know](https://github.com/techxplorer/), if you find they don't work or there are other issues please [add an issue](https://github.com/techxplorer/techxplorer-utils/issues) to let me know.
+If you find these scripts useful please [let me know](https://github.com/techxplorer/). If you find they don't work, please [add an issue](https://github.com/techxplorer/techxplorer-utils/issues) to let me know.
 
 ## Supported Platforms ##
-These scripts have been developed and tested on [OS X](http://en.wikipedia.org/wiki/OS_X) and as such should work for other [Unix](http://en.wikipedia.org/wiki/Unix)/[Linux](http://en.wikipedia.org/wiki/Linux) like operating systems. 
+These scripts have been developed and tested on [OS X](http://en.wikipedia.org/wiki/OS_X) and as such many of them should work for other [Unix](http://en.wikipedia.org/wiki/Unix)/[Linux](http://en.wikipedia.org/wiki/Linux) like operating systems. 
 
-If you're working on [Microsoft Windows](http://en.wikipedia.org/wiki/Microsoft_Windows) they're likely to not work. Indeed some will not work due to operating system dependencies. 
+Some of the scripts are OS X specific. When this is the case it is noted on the wiki page for the script. 
+
+If you're working on [Microsoft Windows](http://en.wikipedia.org/wiki/Microsoft_Windows) they're likely to not work at all.
 
 ## Installation ##
 1. Clone the repository or download the ZIP file
@@ -26,6 +28,7 @@ These scripts use the following libraries, installed and managed using [Composer
 3. [symfony/yaml](https://github.com/symfony/Yaml)
 4. [behat/gherkin](https://github.com/Behat/Gherkin)
 5. [chobie/jira-api-restclient](https://github.com/chobie/jira-api-restclient)
+6. [rodneyrehm/plist](https://github.com/rodneyrehm/plist)
 
 My thanks to the authors of, and contributors to, these libraries. My own development would not have been possible without them. 
 
