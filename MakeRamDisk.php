@@ -150,14 +150,14 @@ class MakeRamDisk
             $disk_size = $arguments['size'];
             if (!is_numeric($disk_size)) {
                 \cli\err("%rERROR: %wthe size argument must be numeric\n");
-                die(-1);
+                die(1);
             }
             
             $disk_size = (int)$disk_size;
 
             if (!is_int($disk_size)) {
                 \cli\err("%rERROR: %wthe size argument must be an integer\n");
-                die(-1);
+                die(1);
             }
         }
 
@@ -177,14 +177,14 @@ class MakeRamDisk
             $diskutil_path = Files::findApp('diskutil');
         } catch (FileNotFoundException $ex) {
             \cli\err("%rERROR: %w" . $ex->getMessage() . "\n");
-            die(-1);
+            die(1);
         }
 
         try {
             $hdiutil_path = Files::findApp('hdiutil');
         } catch (FileNotFoundException $ex) {
             \cli\err("%rERROR: %w" . $ex->getMessage() . "\n");
-            die(-1);
+            die(1);
         }
 
         // create the volume
@@ -201,7 +201,7 @@ class MakeRamDisk
 
         if ($return_var != 0) {
             \cli\err("%rERROR: %w unable to create the volume\n");
-            die(-1);
+            die(1);
         }
 
         $volume_id = $output[0];
@@ -219,7 +219,7 @@ class MakeRamDisk
 
         if ($return_var != 0) {
             \cli\err("%rERROR: %wunable to format the volume\n");
-            die(-1);
+            die(1);
         }
 
         // output some info

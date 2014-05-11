@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "efe8d47c53b683ebdefa46d253d211e9",
+    "hash": "297e021861fc363ea849692f95b6b4b3",
     "packages": [
         {
             "name": "behat/gherkin",
@@ -159,6 +159,50 @@
             "time": "2014-02-20 16:37:01"
         },
         {
+            "name": "rodneyrehm/plist",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rodneyrehm/CFPropertyList.git",
+                "reference": "80e965a5ca0185f3a87295d03eb9becfd96fe862"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rodneyrehm/CFPropertyList/zipball/80e965a5ca0185f3a87295d03eb9becfd96fe862",
+                "reference": "80e965a5ca0185f3a87295d03eb9becfd96fe862",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "CFPropertyList": "classes/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Kruse",
+                    "email": "cjk@wwwtech.de"
+                },
+                {
+                    "name": "Rodney Rehm",
+                    "email": "mail+github@rodneyrehm.de"
+                }
+            ],
+            "description": "Library for reading and writing Apple's CFPropertyList (plist) files in XML as well as binary format.",
+            "homepage": "https://github.com/rodneyrehm/CFPropertyList",
+            "keywords": [
+                "plist"
+            ],
+            "time": "2013-10-17 07:12:30"
+        },
+        {
             "name": "symfony/yaml",
             "version": "dev-master",
             "target-dir": "Symfony/Component/Yaml",
@@ -258,24 +302,17 @@
             "time": "2013-08-16 11:56:30"
         }
     ],
-    "packages-dev": [
-
-    ],
-    "aliases": [
-
-    ],
+    "packages-dev": [],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
         "jlogsdon/cli": 20,
         "yzalis/identicon": 20,
         "symfony/yaml": 20,
         "behat/gherkin": 20,
-        "chobie/jira-api-restclient": 20
+        "chobie/jira-api-restclient": 20,
+        "rodneyrehm/plist": 20
     },
-    "platform": [
-
-    ],
-    "platform-dev": [
-
-    ]
+    "platform": [],
+    "platform-dev": []
 }

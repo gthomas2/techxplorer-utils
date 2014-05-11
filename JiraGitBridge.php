@@ -270,7 +270,7 @@ class JiraGitBridge
         // change to the repo path
         if (!chdir($repo_path)) {
             \cli\err("%rERROR: %wUnable to change to repository directory\n");
-            die(-1);
+            die(1);
         }
 
         // get a list of all of the commits
@@ -280,7 +280,7 @@ class JiraGitBridge
         if ($result == null || $result == '') {
             \cli\err("%rERROR: %wUnable to execute git command:\n");
             \cli\err($command . "\n");
-            die(-1);
+            die(1);
         }
 
         // process the results

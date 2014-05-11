@@ -481,7 +481,7 @@ class DbAssist
         if (!pg_fetch_row($result) == true) {
             \cli\err("Error: The database doesn't exist\n");
             pg_close($db_connection);
-            die(-1);
+            die(1);
         }
 
         // drop the existing database
