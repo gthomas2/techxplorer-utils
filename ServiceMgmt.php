@@ -65,7 +65,7 @@ class ServiceMgmt
     /**
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.0';
+    const SCRIPT_VERSION = 'v1.0.1';
 
     /**
      * defines the uri for more information
@@ -355,7 +355,19 @@ class ServiceMgmt
             \cli\out("%gSUCCESS: %wAll services started\n");
         }
 
-        return !$warnings;
+        // just because the start command didn't error
+        // doesn't mean the service is actually running
+        $status = $this->_servicesStatus(
+            $launchctl,
+            $launchagents,
+            $services
+        );
+
+        if (!$warnings && $status) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
