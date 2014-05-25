@@ -64,7 +64,7 @@ class MdlUserListCreator
     /**
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.3';
+    const SCRIPT_VERSION = 'v1.0.4';
 
     /**
      * defines the uri for more information
@@ -193,7 +193,7 @@ class MdlUserListCreator
                 "\n"
             );  
             die(1);
-        }   
+        }
 
         // output the list of avaialble roles
         if ($arguments['list-roles']) {
@@ -290,7 +290,7 @@ class MdlUserListCreator
 
             } else {
                 // numeric
-                if (!array_key_exists($arguments['role'], $role_def)) {
+                if (!array_key_exists($arguments['role'], $role_defs)) {
                     \cli\err(
                         "ERROR: Un-recognised role id " . 
                         "'{$arguments['role']}'\n"
@@ -350,8 +350,8 @@ class MdlUserListCreator
             \cli\out("Creating file of $required_records user records\n");
             \cli\out("  with email addresses @ $domain_name\n");
             \cli\out("  with course short code: $course\n");
-            if (!$role) {
-                \cli\out("  with role id: $role\n");
+            if ($role !== false) {
+                \cli\out('  with role: ' . $role_defs[$role] . "\n");
             }
             \cli\out("  to $output_path\n");
         } else {

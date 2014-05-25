@@ -64,7 +64,7 @@ class JiraGitBridge
     /**
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.1.0';
+    const SCRIPT_VERSION = 'v1.1.1';
 
     /**
      * defines the uri for more information
@@ -289,8 +289,24 @@ class JiraGitBridge
         $merges = 0;
 
         foreach ($results as $commit) {
+
+            // skip empty lines
+            if (!strlen($commit) > 0) {
+                continue;
+            };
+
             $tmp = explode(' ', $commit);
-            $commits[] = array($tmp[0], trim($tmp[1], ':'));
+
+            // build data elements
+            $hash = $tmp[0];
+            $code = trim($tmp[1], ':');
+
+            unset($tmp[0]);
+            unset($tmp[1]);
+
+            $desc = implode(' ', $tmp);
+
+            $commits[] = array($hash, $code, $desc);
         }
 
         // get a list of just merges
@@ -307,6 +323,12 @@ class JiraGitBridge
         $results = explode("\n", $result);
 
         foreach ($results as $result) {
+
+            // skip empty lines
+            if (!strlen($result) > 0) {
+                continue;
+            }
+
             $tmp = explode(' ', $result);
 
             $code = trim($tmp[1], ':');
@@ -331,7 +353,7 @@ class JiraGitBridge
 
         // output a list of commits
         $table = new \cli\Table();
-        $table->setHeaders(array('Hash', 'JIRA Code'));
+        $table->setHeaders(array('Hash', 'JIRA Code', 'Description'));
         $table->setRows($commits);
         $table->display();
 
