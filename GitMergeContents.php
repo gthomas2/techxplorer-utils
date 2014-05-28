@@ -197,7 +197,7 @@ class GitMergeContents
                 continue;
             }
 
-            // no we have something to output
+            // now we have something to output
             $commits[] = implode(' ', $tmp);
         }
 
@@ -209,12 +209,17 @@ class GitMergeContents
             die(0);
         }
 
+        // don't output the same item description twice
+        $commits = array_unique($commits);
+
+        // output the information to the user
         \cli\out("\nImplements: \n");
         $tree = new \cli\Tree;
         $tree->setData($commits);
         $tree->setRenderer(new \cli\tree\Markdown(2));
         $tree->display();
         \cli\out("\n");
+        \cli\out("Number of items: " . count($commits) . "\n");
     }
 } 
 
