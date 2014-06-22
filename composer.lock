@@ -72,12 +72,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/chobie/jira-api-restclient.git",
-                "reference": "320e6bf6b8027748ca5fcf12e306770dc7a94acd"
+                "reference": "6d1cf6ab2c3f6428934641309f552c67301a617f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chobie/jira-api-restclient/zipball/320e6bf6b8027748ca5fcf12e306770dc7a94acd",
-                "reference": "320e6bf6b8027748ca5fcf12e306770dc7a94acd",
+                "url": "https://api.github.com/repos/chobie/jira-api-restclient/zipball/6d1cf6ab2c3f6428934641309f552c67301a617f",
+                "reference": "6d1cf6ab2c3f6428934641309f552c67301a617f",
                 "shasum": ""
             },
             "require": {
@@ -112,7 +112,7 @@
                 "jira",
                 "rest"
             ],
-            "time": "2014-04-15 02:58:08"
+            "time": "2014-06-12 14:17:09"
         },
         {
             "name": "jlogsdon/cli",
