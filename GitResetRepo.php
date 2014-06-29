@@ -39,6 +39,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 // shorten namespaces
 use \Techxplorer\Utils\Files as Files;
 use \Techxplorer\Utils\System as System;
+use \Techxplorer\Utils\Git as Git;
 
 use \Techxplorer\Utils\FileNotFoundException;
 
@@ -62,7 +63,7 @@ class GitResetRepo
     /** 
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.0';
+    const SCRIPT_VERSION = 'v1.0.1';
 
     /**
      * defines the uri for more information
@@ -161,332 +162,43 @@ class GitResetRepo
             die(1);
         }
 
+        // get a reference to the git library
+        $git = new Git($git_path);
+
         // delete all the branches except the default one
-        if (!$this->deleteBranches($git_path, $default_branch)) {
+        if (!$git->deleteBranches($default_branch)) {
             die(1);
         }
 
         // download the latest changes
-        if (!$this->fetchChanges($git_path)) {
+        if (!$git->fetchChanges()) {
             die(1);
         }
 
         // reset the branch
-        if (!$this->resetBranch($git_path)) {
+        if (!$git->resetBranch()) {
             die(1);
         }
 
         // clean the branch
-        if (!$this->cleanBranch($git_path)) {
+        if (!$git->cleanBranch()) {
             die(1);
         }
 
         // prune the reflog
-        if (!$this->pruneReflog($git_path)) {
+        if (!$git->pruneRefLog()) {
             die(1);
         }
 
         // clean and optimise repository
-        if (!$this->cleanRepo($git_path)) {
+        if (!$git->cleanRepo()) {
             die(1);
         }
 
         // repack repository objects
-        if (!$this->repackRepo($git_path)) {
+        if (!$git->repackRepo()) {
             die(1);
         }
-    }
-
-    /**
-     * Repack the repository
-     *
-     * @param string $git_path the path to the git binary
-     *
-     * @return boolean true on success, false on failure
-     */
-    public function repackRepo($git_path)
-    {
-        // keep the user informed
-        \cli\out("INFO: Repacking the repository...\n");
-
-        // clean the branch of untracked files
-        $command = "{$git_path} repack -ad 2>&1";
-        $output = '';
-        $return_var = '';
-        exec($command, $output, $return_var);
-
-        // check to make sure the command executed successfully
-        if ($return_var != 0) {
-            \cli\err("%rERROR: %wUnable to repack the repository\n");
-            return false;
-        }
-
-        \cli\out(
-            "%gSUCCESS: %wRepository repacked\n"
-        );
-
-        return true;
-    }
-
-    /**
-     * Clean and optimise the repository
-     *
-     * @param string $git_path the path to the git binary
-     *
-     * @return boolean true on success, false on failure
-     */
-    public function cleanRepo($git_path)
-    {
-        // keep the user informed
-        \cli\out("INFO: Cleaning and optimising repository...\n");
-
-        // clean the branch of untracked files
-        $command = "{$git_path} gc --prune=now 2>&1";
-        $output = '';
-        $return_var = '';
-        exec($command, $output, $return_var);
-
-        // check to make sure the command executed successfully
-        if ($return_var != 0) {
-            \cli\err("%rERROR: %wUnable to clean and optimise the repository\n");
-            return false;
-        }
-
-        \cli\out(
-            "%gSUCCESS: %wRepository cleaned and optimised\n"
-        );
-
-        return true;
-    }
-
-    /**
-     * Prune the reflog of expired entries
-     *
-     * @param string $git_path the path to the git binary
-     *
-     * @return boolean true on success, false on failure
-     */
-    public function pruneReflog($git_path)
-    {
-        // keep the user informed
-        \cli\out("INFO: Pruning the reflog...\n");
-
-        // clean the branch of untracked files
-        $command = "{$git_path} reflog expire --all --expire=now 2>&1";
-        $output = '';
-        $return_var = '';
-        exec($command, $output, $return_var);
-
-        // check to make sure the command executed successfully
-        if ($return_var != 0) {
-            \cli\err("%rERROR: %wUnable to prune the reflog\n");
-            return false;
-        }
-
-        \cli\out(
-            "%gSUCCESS: %wReflog pruned\n"
-        );
-
-        return true;
-    }
-
-    /**
-     * Clean the branch of untracked files
-     *
-     * @param string $git_path the path to the git binary
-     *
-     * @return boolean true on sucess, false on failure
-     */
-    public function cleanBranch($git_path)
-    {
-        // keep the user informed
-        \cli\out("INFO: Cleaning branch of untracked files...\n");
-
-        // clean the branch of untracked files
-        $command = "{$git_path} clean -fd 2>&1";
-        $output = '';
-        $return_var = '';
-        exec($command, $output, $return_var);
-
-        // check to make sure the command executed successfully
-        if ($return_var != 0) {
-            \cli\err("%rERROR: %wUnable to clean branch\n");
-            return false;
-        }
-
-        \cli\out(
-            "%gSUCCESS: %wBranch cleaned\n"
-        );
-
-        return true;
-    }
-
-    /**
-     * Reset the branch to the remote HEAD
-     *
-     * @param string  $git_path the path to the git binary
-     * @param boolean $verbose  if true output extra information
-     *
-     * @return boolean true on success, false on failure
-     */
-    public function resetBranch($git_path, $verbose = false)
-    {
-        // keep the user informed
-        \cli\out("INFO: Reseting branch to remote HEAD...\n");
-
-        // work out the current branch
-        $command = "{$git_path} rev-parse --abbrev-ref HEAD";
-        $branch_name = trim(shell_exec($command));
-
-        if ($branch_name == null || $branch_name == '') {
-            \cli\err("%rERROR: %wUnable to execute git command:\n");
-            \cli\err($command . "\n");
-            return false;
-        }
-
-        // keep the user informed
-        if ($verbose) {
-            \cli\out("INFO: Branch name: $branch_name\n");
-        }
-
-        // reset the branch
-        $command = "{$git_path} reset --hard origin/$branch_name 2>&1";
-        $output = '';
-        $return_var = '';
-        exec($command, $output, $return_var);
-
-        // check to make sure the command executed successfully
-        if ($return_var != 0) {
-            \cli\err("%rERROR: %wUnable to reset branch\n");
-            return false;
-        }
-
-        // keep the user informed
-        if ($verbose) {
-            \cli\out(
-                "%gSUCCESS: %wBranch reset: {$output[0]}\n"
-            );
-        } else {
-            \cli\out(
-                "%gSUCCESS: %wReset branch to latest HEAD\n"
-            );
-        }
-
-        return true;
-    }
-
-    /**
-     * Fetch the latest changes from the remote repository
-     *
-     * @param string $git_path path to the git binary
-     *
-     * @return boolean true on success, false on failure
-     */
-    public function fetchChanges($git_path)
-    {
-        // keep the user informed
-        \cli\out("INFO: Fetching latest changes...\n");
-
-        // fetch the latest changes
-        $command = "{$git_path} fetch 2>&1";
-        $output = '';
-        $return_var = '';
-        exec($command, $output, $return_var);
-
-        // check to make sure the command executed successfully
-        if ($return_var != 0) {
-            \cli\err("%rERROR: %wUnable to fetch changes\n");
-            return false;
-        }
-
-        \cli\out(
-            "%gSUCCESS: %wFetched the latest changes\n"
-        );
-
-        return true;
-    }
-
-    /**
-     * Delete all branches in a repository except the
-     * one specified
-     *
-     * @param string $git_path       path to the git binary
-     * @param string $default_branch the default branch
-     *
-     * @return boolean true on success, false on failure
-     */
-    public function deleteBranches($git_path, $default_branch)
-    {
-        // keep the user informed
-        \cli\out("INFO: Deleting branches...\n");
-
-        // get a list of branches
-        $command = "{$git_path} branch";
-        $result = trim(shell_exec($command));
-
-        if ($result == null || $result == '') {
-            \cli\err("%rERROR: %wUnable to execute git command:\n");
-            \cli\err($command . "\n");
-            return false;
-        }
-
-        // process the list of branches
-        $results = explode("\n", $result);
-        $branches = array();
-
-        foreach ($results as $branch) {
-            // skip empty lines
-            if (!strlen($branch) > 0) {
-                continue;
-            };
-
-            // trim the branch entry
-            $branch = trim($branch, '* ');
-
-            $branches[] = $branch;
-        }
-
-        // see if the default branch is in the list
-        if (!in_array($default_branch, $branches)) {
-            \cli\err("%rERROR: %wUnable to find the branch '$default_branch'\n");
-            return false;
-        }
-
-        // ensure we're on the default branch
-        $command = "{$git_path} checkout $default_branch 2>&1";
-        $output = '';
-        $return_var = '';
-        exec($command, $output, $return_var);
-
-        // check to make sure the command executed successfully
-        if ($return_var != 0) {
-            \cli\err("%rERROR: %wUnable to change branch '$default_branch'\n");
-            return false;
-        }
-
-        // remove the default branch from the list of branches
-        $branches = array_diff($branches, array($default_branch));
-
-        // delete all of the other branches
-        foreach ($branches as $branch) {
-
-            $command = "{$git_path} branch -D $branch 2>&1";
-            $output = '';
-            $return_var = '';
-            exec($command, $output, $return_var);
-
-            if ($return_var != 0) {
-                \cli\err("%rERROR: %wUnable to delete branch '{$branch}'\n");
-                return false;
-            }
-        }
-
-        \cli\out(
-            "%gSUCCESS: %wDeleted " . count($branches)
-            . " branches. Now on $default_branch\n"
-        );
-
-        return true;
     }
 }
 
