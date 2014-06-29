@@ -210,12 +210,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "b4b09c68ec2f2727574544ef0173684281a5033c"
+                "reference": "fcfc29182d793e30f00961b2e60983bc64b38331"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/b4b09c68ec2f2727574544ef0173684281a5033c",
-                "reference": "b4b09c68ec2f2727574544ef0173684281a5033c",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/fcfc29182d793e30f00961b2e60983bc64b38331",
+                "reference": "fcfc29182d793e30f00961b2e60983bc64b38331",
                 "shasum": ""
             },
             "require": {
@@ -250,7 +250,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-05-16 14:25:18"
+            "time": "2014-06-19 14:02:29"
         },
         {
             "name": "yzalis/identicon",
