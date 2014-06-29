@@ -40,6 +40,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 // shorten namespaces
 use \Techxplorer\Utils\Files as Files;
 use \Techxplorer\Utils\System as System;
+use \Techxplorer\Utils\Git as Git;
 
 use \Techxplorer\Utils\FileNotFoundException;
 
@@ -144,100 +145,17 @@ class GitFetchReset
             die(1);
         }
 
+        $git = new Git($git_path);
+
         // download the latest changes
-        if (!$this->fetchChanges($git_path)) {
+        if (!$git->fetchChanges()) {
             die(1);
         }
 
         // reset the branch
-        if (!$this->resetBranch($git_path, true)) {
+        if (!$git->resetBranch(true)) {
             die(1);
         }
-    }
-
-    /**
-     * Reset the branch to the remote HEAD
-     *
-     * @param string  $git_path the path to the git binary
-     * @param boolean $verbose  if true output extra information
-     *
-     * @return boolean true on success, false on failure
-     */
-    public function resetBranch($git_path, $verbose = false)
-    {
-        // keep the user informed
-        \cli\out("INFO: Reseting branch to remote HEAD...\n");
-
-        // work out the current branch
-        $command = "{$git_path} rev-parse --abbrev-ref HEAD";
-        $branch_name = trim(shell_exec($command));
-
-        if ($branch_name == null || $branch_name == '') {
-            \cli\err("%rERROR: %wUnable to execute git command:\n");
-            \cli\err($command . "\n");
-            return false;
-        }
-
-        // keep the user informed
-        if ($verbose) {
-            \cli\out("INFO: Branch name: $branch_name\n");
-        }
-
-        // reset the branch
-        $command = "{$git_path} reset --hard origin/$branch_name 2>&1";
-        $output = '';
-        $return_var = '';
-        exec($command, $output, $return_var);
-
-        // check to make sure the command executed successfully
-        if ($return_var != 0) {
-            \cli\err("%rERROR: %wUnable to reset branch\n");
-            return false;
-        }
-
-        // keep the user informed
-        if ($verbose) {
-            \cli\out(
-                "%gSUCCESS: %wBranch reset: {$output[0]}\n"
-            );
-        } else {
-            \cli\out(
-                "%gSUCCESS: %wReset branch to latest HEAD\n"
-            );
-        }
-
-        return true;
-    }
-
-    /**
-     * Fetch the latest changes from the remote repository
-     *
-     * @param string $git_path path to the git binary
-     *
-     * @return boolean true on success, false on failure
-     */
-    public function fetchChanges($git_path)
-    {
-        // keep the user informed
-        \cli\out("INFO: Fetching latest changes...\n");
-
-        // fetch the latest changes
-        $command = "{$git_path} fetch 2>&1";
-        $output = '';
-        $return_var = '';
-        exec($command, $output, $return_var);
-
-        // check to make sure the command executed successfully
-        if ($return_var != 0) {
-            \cli\err("%rERROR: %wUnable to fetch changes\n");
-            return false;
-        }
-
-        \cli\out(
-            "%gSUCCESS: %wFetched the latest changes\n"
-        );
-
-        return true;
     }
 }
 
