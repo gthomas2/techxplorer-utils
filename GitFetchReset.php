@@ -17,7 +17,8 @@
  * along with Techxplorer's Utility Scripts.
  * If not, see <http://www.gnu.org/licenses/>
  *
- * This is a PHP script which can be used to reset a git repository
+ * This is a PHP script which can be used to fetch the latest
+ * changes and update the current branch
  *
  * PHP Version 5.4 
  *
@@ -53,17 +54,17 @@ use \Techxplorer\Utils\FileNotFoundException;
  * @link     https://github.com/techxplorer/techxplorer-utils
  *
  */
-class GitResetRepo
+class GitFetchReset
 {
     /** 
      * defines a name for the script
      */
-    const SCRIPT_NAME = "Techxplorer's Git Reset Repo script";
+    const SCRIPT_NAME = "Techxplorer's Git Fetch and Reset script";
 
     /** 
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.1';
+    const SCRIPT_VERSION = 'v1.0.0';
 
     /**
      * defines the uri for more information
@@ -91,14 +92,6 @@ class GitResetRepo
         $arguments = new \cli\Arguments($_SERVER['argv']);
 
         $arguments->addOption(
-            array('branch', 'b'),
-            array(
-                'default' => '',
-                'description' => 'The default branch'
-            )
-        );
-
-        $arguments->addOption(
             array('repository', 'r'),
             array(
                 'default' => '',
@@ -118,15 +111,6 @@ class GitResetRepo
         if ($arguments['help']) {
             \cli\out($arguments->getHelpScreen());
             \cli\out("\n");
-        }
-
-        if (!$arguments['branch']) {
-            \cli\err("%rERROR: %wMissing required argument --branch\n");
-            \cli\err($arguments->getHelpScreen());
-            \cli\err("\n");
-            die(1);
-        } else {
-            $default_branch = $arguments['branch'];
         }
 
         if (!$arguments['repository']) {
@@ -153,7 +137,6 @@ class GitResetRepo
         }
 
         // output some helper text
-        \cli\out("Resetting to branch: {$default_branch}\n");
         \cli\out("Using this git: {$git_path}\n");
 
         // change to the repo path
@@ -162,13 +145,7 @@ class GitResetRepo
             die(1);
         }
 
-        // get a reference to the git library
         $git = new Git($git_path);
-
-        // delete all the branches except the default one
-        if (!$git->deleteBranches($default_branch)) {
-            die(1);
-        }
 
         // download the latest changes
         if (!$git->fetchChanges()) {
@@ -176,27 +153,7 @@ class GitResetRepo
         }
 
         // reset the branch
-        if (!$git->resetBranch()) {
-            die(1);
-        }
-
-        // clean the branch
-        if (!$git->cleanBranch()) {
-            die(1);
-        }
-
-        // prune the reflog
-        if (!$git->pruneRefLog()) {
-            die(1);
-        }
-
-        // clean and optimise repository
-        if (!$git->cleanRepo()) {
-            die(1);
-        }
-
-        // repack repository objects
-        if (!$git->repackRepo()) {
+        if (!$git->resetBranch(true)) {
             die(1);
         }
     }
@@ -205,7 +162,7 @@ class GitResetRepo
 // make sure script is only run on the cli
 if (System::isOnCLI()) {
     // yes
-    $app = new GitResetRepo();
+    $app = new GitFetchReset();
     $app->doTask();
 } else {
     // no
