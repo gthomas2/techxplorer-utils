@@ -64,7 +64,7 @@ class GitFetchReset
     /** 
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.0';
+    const SCRIPT_VERSION = 'v1.0.1';
 
     /**
      * defines the uri for more information
@@ -114,10 +114,21 @@ class GitFetchReset
         }
 
         if (!$arguments['repository']) {
-            \cli\err("%rERROR: %wMissing required argument --repository\n");
-            \cli\err($arguments->getHelpScreen());
-            \cli\err("\n");
-            die(1);
+
+            // get the current directory if a path isn't provided
+            $repo_path = realpath(getcwd());
+
+            if ($repo_path === false) {
+                \cli\err("%rERROR: %wMissing required argument --repository\n");
+                \cli\err($arguments->getHelpScreen());
+                \cli\err("\n");
+                die(1);
+            } else {
+                \cli\out(
+                    "%yWARNING: %wUsing current working directory\n" .
+                    "{$repo_path}\n\n"
+                );
+            }
         } else {
             $repo_path = $arguments['repository'];
             $repo_path = realpath($repo_path);

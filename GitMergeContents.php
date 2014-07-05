@@ -38,6 +38,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 // shorten namespaces
 use \Techxplorer\Utils\Files as Files;
 use \Techxplorer\Utils\System as System;
+use \Techxplorer\Utils\Git as Git;
 
 use \Techxplorer\Utils\FileNotFoundException;
 
@@ -61,7 +62,7 @@ class GitMergeContents
     /** 
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.0';
+    const SCRIPT_VERSION = 'v1.0.1';
 
     /**
      * defines the uri for more information
@@ -128,10 +129,20 @@ class GitMergeContents
         }
 
         if (!$arguments['repository']) {
-            \cli\err("%rERROR: %wMissing required argument --repository\n");
-            \cli\err($arguments->getHelpScreen());
-            \cli\err("\n");
-            die(1);
+            // get the current directory if a path isn't provided
+            $repo_path = realpath(getcwd());
+
+            if ($repo_path === false) {
+                \cli\err("%rERROR: %wMissing required argument --repository\n");
+                \cli\err($arguments->getHelpScreen());
+                \cli\err("\n");
+                die(1);
+            } else {
+                \cli\out(
+                    "%yWARNING: %wUsing current working directory\n" .
+                    "{$repo_path}\n\n"
+                );
+            }
         } else {
             $repo_path = $arguments['repository'];
             $repo_path = realpath($repo_path);
@@ -160,51 +171,15 @@ class GitMergeContents
             die(1);
         }
 
-        // get the contents of the merge commit
-        //git log --oneline e9117f6^...e9117f6
-        $command = "{$git_path} log --oneline {$commit_hash}^...{$commit_hash}";
-        $result = trim(shell_exec($command));
+        $git = new Git($git_path);
 
-        if ($result == null || $result == '') {
-            \cli\err("%rERROR: %wUnable to execute git command:\n");
-            \cli\err($command . "\n");
-            die(1);
-        }
-
-        // process the results
-        $results = explode("\n", $result);
-        $commits = array();
-
-        foreach ($results as $commit) {
-
-            // skip empty lines
-            if (!strlen($commit) > 0) {
-                continue;
-            };
-
-            $tmp = explode(' ', $commit);
-
-            // skip references to the merge commit itself
-            if ($tmp[0] == $commit_hash) {
-                continue;
-            }
-
-            // we don't want to output the commit hash
-            array_shift($tmp);
-
-            // we also don't want to output merge commits
-            if ($tmp[0] == 'Merge') {
-                continue;
-            }
-
-            // now we have something to output
-            $commits[] = implode(' ', $tmp);
-        }
+        $commits = $git->getMergeContents($commit_hash);
 
         // output the list of commits
         if (count($commits) == 0) {
             \cli\out(
-                "%yWARNING: %wno commits found. Was it really a merge commit?\n"
+                "%yWARNING: %wno commits found. " .
+                "Was '{$commit_hash}' really a merge commit?\n"
             );
             die(0);
         }
@@ -232,5 +207,3 @@ if (System::isOnCLI()) {
     // no
     die("This script can only be run on the cli\n");
 }
-
-?>
