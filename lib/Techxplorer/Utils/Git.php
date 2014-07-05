@@ -348,4 +348,62 @@ class Git
 
         return true;
     }
+
+    /**
+     * Get the list of commits contained in a merge commit
+     *
+     * @param string  $hash the commit hash id
+     * @param boolean $include_hashes if true, include hashes in list of commits
+     * @param boolean $skip_merges if true, skip any merge commits
+     *
+     * @return mixed array() on success or false on failure
+     */
+    public function getMergeContents($hash, $include_hashes = false, $skip_merges = true) {
+        //git log --oneline e9117f6^...e9117f6
+        $command = "{$this->_git_path} log --oneline {$hash}^...{$hash}";
+        $result = trim(shell_exec($command));
+
+        if ($result == null || $result == '') {
+            \cli\err("%rERROR: %wUnable to execute git command:\n");
+            \cli\err($command . "\n");
+            die(1);
+        }
+
+        // process the results
+        $results = explode("\n", $result);
+        $commits = array();
+
+        foreach ($results as $commit) {
+
+            // skip empty lines
+            $commit = trim($commit);
+            if (!strlen($commit) > 0) {
+                continue;
+            };
+
+            $tmp = explode(' ', $commit);
+
+            // skip references to the merge commit itself
+            if ($tmp[0] == $hash) {
+                continue;
+            }
+
+            // return the commit hash?
+            if (!$include_hashes) {
+                array_shift($tmp);
+            }
+
+            // return merge commits?
+            if ($tmp[0] == 'Merge' && $skip_merges && !$include_hashes) {
+                continue;
+            } else if ($tmp[1] == 'Merge' && $skip_merges && $include_hashes) {
+                continue;
+            }
+
+            // now we have something to return
+            $commits[] = implode(' ', $tmp);
+        }
+
+        return $commits;
+    }
 }
