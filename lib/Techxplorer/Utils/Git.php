@@ -352,13 +352,16 @@ class Git
     /**
      * Get the list of commits contained in a merge commit
      *
-     * @param string  $hash the commit hash id
+     * @param string  $hash           the commit hash id
      * @param boolean $include_hashes if true, include hashes in list of commits
-     * @param boolean $skip_merges if true, skip any merge commits
+     * @param boolean $skip_merges    if true, skip any merge commits
      *
      * @return mixed array() on success or false on failure
      */
-    public function getMergeContents($hash, $include_hashes = false, $skip_merges = true) {
+    public function getMergeContents($hash,
+        $include_hashes = false,
+        $skip_merges = true
+    ) {
         //git log --oneline e9117f6^...e9117f6
         $command = "{$this->_git_path} log --oneline {$hash}^...{$hash}";
         $result = trim(shell_exec($command));
@@ -405,5 +408,31 @@ class Git
         }
 
         return $commits;
+    }
+
+    /**
+     * Check of a clean repository, in that git status returns no entries
+     *
+     * @return boolean true if clean, false if not
+     */
+    public function isClean()
+    {
+        // run git status and check for output
+        $command = "{$this->_git_path} status --porcelain";
+        $output = array();
+        $return_var = '';
+        exec($command, $output, $return_var);
+
+        // check to make sure the command executed successfully
+        if ($return_var != 0) {
+            \cli\err("%rERROR: %wUnable to check if the repository is clean\n");
+            return false;
+        }
+
+        if (count($output) > 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
