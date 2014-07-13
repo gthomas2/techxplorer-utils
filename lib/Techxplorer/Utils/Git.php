@@ -111,12 +111,9 @@ class Git
         \cli\out("INFO: Reseting branch to remote HEAD...\n");
 
         // work out the current branch
-        $command = "{$this->_git_path} rev-parse --abbrev-ref HEAD";
-        $branch_name = trim(shell_exec($command));
+        $branch_name = $this->getCurrentBranch();
 
-        if ($branch_name == null || $branch_name == '') {
-            \cli\err("%rERROR: %wUnable to execute git command:\n");
-            \cli\err($command . "\n");
+        if ($branch_name == false) {
             return false;
         }
 
@@ -352,13 +349,16 @@ class Git
     /**
      * Get the list of commits contained in a merge commit
      *
-     * @param string  $hash the commit hash id
+     * @param string  $hash           the commit hash id
      * @param boolean $include_hashes if true, include hashes in list of commits
-     * @param boolean $skip_merges if true, skip any merge commits
+     * @param boolean $skip_merges    if true, skip any merge commits
      *
      * @return mixed array() on success or false on failure
      */
-    public function getMergeContents($hash, $include_hashes = false, $skip_merges = true) {
+    public function getMergeContents($hash,
+        $include_hashes = false,
+        $skip_merges = true
+    ) {
         //git log --oneline e9117f6^...e9117f6
         $command = "{$this->_git_path} log --oneline {$hash}^...{$hash}";
         $result = trim(shell_exec($command));
@@ -405,5 +405,89 @@ class Git
         }
 
         return $commits;
+    }
+
+    /**
+     * Check of a clean repository, in that git status returns no entries
+     *
+     * @return boolean true if clean, false if not
+     */
+    public function isClean()
+    {
+        // run git status and check for output
+        $command = "{$this->_git_path} status --porcelain";
+        $output = array();
+        $return_var = '';
+        exec($command, $output, $return_var);
+
+        // check to make sure the command executed successfully
+        if ($return_var != 0) {
+            \cli\err("%rERROR: %wUnable to check if the repository is clean\n");
+            return false;
+        }
+
+        if (count($output) > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Get the current checked out branch
+     *
+     * @return mixed branch name or false on failure
+     */
+    public function getCurrentBranch()
+    {
+        $command = "{$this->_git_path} rev-parse --abbrev-ref HEAD";
+        $branch_name = trim(shell_exec($command));
+
+        if ($branch_name == null || $branch_name == '') {
+            \cli\err("%rERROR: %wUnable to execute git command:\n");
+            \cli\err($command . "\n");
+            return false;
+        }
+
+        return $branch_name;
+    }
+
+    /**
+     * Push the changes to Gerrit
+     * TODO add a check to ensure only one commit ahead of branch
+     *
+     * @return boolean true on success, false on failure
+     */
+    public function pushChangesToGerrit()
+    {
+
+        // get the current branch
+        $branch = $this->getCurrentBranch();
+
+        // execute the push
+        $command = "{$this->_git_path} push origin HEAD:refs/for/$branch 2>&1";
+        $output = array();
+        $return_var = '';
+        exec($command, $output, $return_var);
+
+        // check to make sure the command executed successfully
+        if ($return_var != 0) {
+            \cli\err("%rERROR: %wUnable to push changes\n");
+
+            foreach ($output as $line) {
+                \cli\err("$line\n");
+            }
+
+            return false;
+        } else {
+
+            foreach ($output as $line) {
+                \cli\out("$line\n");
+            }
+
+            \cli\out("%gSUCCESS: %wChanges successfully pushed\n");
+
+            return true;
+        }
     }
 }
