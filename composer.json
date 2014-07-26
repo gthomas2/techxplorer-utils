@@ -1,6 +1,6 @@
 {
 	"require": {
-        "jlogsdon/cli": "dev-master",
+        "wp-cli/php-cli-tools": "dev-master",
         "yzalis/identicon": "1.0.*@dev",
         "symfony/yaml": "2.5.*@dev",
         "behat/gherkin": "4.0.*@dev",
