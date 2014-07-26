@@ -64,7 +64,7 @@ class GitFetchReset
     /** 
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.1';
+    const SCRIPT_VERSION = 'v1.0.2';
 
     /**
      * defines the uri for more information
@@ -165,6 +165,11 @@ class GitFetchReset
 
         // reset the branch
         if (!$git->resetBranch(true)) {
+            die(1);
+        }
+
+        // clean the branch
+        if (!$git->cleanBranch()) {
             die(1);
         }
     }

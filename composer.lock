@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "297e021861fc363ea849692f95b6b4b3",
+    "hash": "07e59c225e07406d67583a0d50f5c176",
     "packages": [
         {
             "name": "behat/gherkin",
@@ -72,12 +72,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/chobie/jira-api-restclient.git",
-                "reference": "6d1cf6ab2c3f6428934641309f552c67301a617f"
+                "reference": "87d6dea6211199d5702c03fb6797841958e95c91"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chobie/jira-api-restclient/zipball/6d1cf6ab2c3f6428934641309f552c67301a617f",
-                "reference": "6d1cf6ab2c3f6428934641309f552c67301a617f",
+                "url": "https://api.github.com/repos/chobie/jira-api-restclient/zipball/87d6dea6211199d5702c03fb6797841958e95c91",
+                "reference": "87d6dea6211199d5702c03fb6797841958e95c91",
                 "shasum": ""
             },
             "require": {
@@ -100,7 +100,7 @@
             ],
             "authors": [
                 {
-                    "name": "Shuhei Tanuma",
+                    "name": "chobie",
                     "email": "chobieeee@php.net",
                     "homepage": "http://blog.stfalcon.com",
                     "role": "Developer"
@@ -112,52 +112,7 @@
                 "jira",
                 "rest"
             ],
-            "time": "2014-06-12 14:17:09"
-        },
-        {
-            "name": "jlogsdon/cli",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jlogsdon/php-cli-tools.git",
-                "reference": "ee739f6c470e77732723597f34b4e5661756349d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jlogsdon/php-cli-tools/zipball/ee739f6c470e77732723597f34b4e5661756349d",
-                "reference": "ee739f6c470e77732723597f34b4e5661756349d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">= 5.3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "cli": "lib/"
-                },
-                "files": [
-                    "lib/cli/cli.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "James Logsdon",
-                    "email": "jlogsdon@php.net",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Console utilities for PHP",
-            "homepage": "http://github.com/jlogsdon/php-cli-tools",
-            "keywords": [
-                "cli",
-                "console"
-            ],
-            "time": "2014-02-20 16:37:01"
+            "time": "2014-07-14 12:00:02"
         },
         {
             "name": "rodneyrehm/plist",
@@ -210,12 +165,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "fcfc29182d793e30f00961b2e60983bc64b38331"
+                "reference": "f868ecdbcc0276b6158dfbf08b9e98ce07f014e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/fcfc29182d793e30f00961b2e60983bc64b38331",
-                "reference": "fcfc29182d793e30f00961b2e60983bc64b38331",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/f868ecdbcc0276b6158dfbf08b9e98ce07f014e1",
+                "reference": "f868ecdbcc0276b6158dfbf08b9e98ce07f014e1",
                 "shasum": ""
             },
             "require": {
@@ -250,7 +205,57 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-06-19 14:02:29"
+            "time": "2014-07-09 09:05:48"
+        },
+        {
+            "name": "wp-cli/php-cli-tools",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wp-cli/php-cli-tools.git",
+                "reference": "3df6b929b7a19f9e9958ab733476b87fb418bce7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wp-cli/php-cli-tools/zipball/3df6b929b7a19f9e9958ab733476b87fb418bce7",
+                "reference": "3df6b929b7a19f9e9958ab733476b87fb418bce7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">= 5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "cli": "lib/"
+                },
+                "files": [
+                    "lib/cli/cli.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "James Logsdon",
+                    "email": "jlogsdon@php.net",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Daniel Bachhuber",
+                    "email": "daniel@handbuilt.co",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "Console utilities for PHP",
+            "homepage": "http://github.com/wp-cli/php-cli-tools",
+            "keywords": [
+                "cli",
+                "console"
+            ],
+            "time": "2014-07-14 07:59:50"
         },
         {
             "name": "yzalis/identicon",
@@ -258,12 +263,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yzalis/Identicon.git",
-                "reference": "0ecb24810136b8bdfe23ba04e29e7cedc273f747"
+                "reference": "a99fc2a3d018512f7914bc6f972952536c0f309b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yzalis/Identicon/zipball/0ecb24810136b8bdfe23ba04e29e7cedc273f747",
-                "reference": "0ecb24810136b8bdfe23ba04e29e7cedc273f747",
+                "url": "https://api.github.com/repos/yzalis/Identicon/zipball/a99fc2a3d018512f7914bc6f972952536c0f309b",
+                "reference": "a99fc2a3d018512f7914bc6f972952536c0f309b",
                 "shasum": ""
             },
             "require": {
@@ -275,7 +280,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0-dev"
+                    "dev-master": "1.1-dev"
                 }
             },
             "autoload": {
@@ -300,20 +305,21 @@
                 "identicon",
                 "image"
             ],
-            "time": "2013-08-16 11:56:30"
+            "time": "2014-07-13 09:19:12"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "jlogsdon/cli": 20,
+        "wp-cli/php-cli-tools": 20,
         "yzalis/identicon": 20,
         "symfony/yaml": 20,
         "behat/gherkin": 20,
         "chobie/jira-api-restclient": 20,
         "rodneyrehm/plist": 20
     },
+    "prefer-stable": false,
     "platform": [],
     "platform-dev": []
 }

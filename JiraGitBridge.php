@@ -40,6 +40,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 use \Techxplorer\Utils\JiraClient as JiraClient;
 use \Techxplorer\Utils\Files as Files;
 use \Techxplorer\Utils\System as System;
+use \Techxplorer\Utils\Git as Git;
 
 use \Techxplorer\Utils\FileNotFoundException;
 use \Techxplorer\Utils\ConfigParseException;
@@ -64,7 +65,7 @@ class JiraGitBridge
     /**
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.1.1';
+    const SCRIPT_VERSION = 'v1.2.0';
 
     /**
      * defines the uri for more information
@@ -187,10 +188,21 @@ class JiraGitBridge
         }
 
         if (!$arguments['repository']) {
-            \cli\err("%rERROR: %wMissing required argument --repository\n");
-            \cli\err($arguments->getHelpScreen());
-            \cli\err("\n");
-            die(1);
+
+            // get the current directory if a path isn't provided
+            $repo_path = realpath(getcwd());
+
+            if ($repo_path === false) {
+                \cli\err("%rERROR: %wMissing required argument --repository\n");
+                \cli\err($arguments->getHelpScreen());
+                \cli\err("\n");
+                die(1);
+            } else {
+                \cli\out(
+                    "%yWARNING: %wUsing current working directory\n" .
+                    "{$repo_path}\n\n"
+                );
+            }
         } else {
             $repo_path = $arguments['repository'];
             $repo_path = realpath($repo_path);
@@ -273,92 +285,22 @@ class JiraGitBridge
             die(1);
         }
 
-        // get a list of all of the commits
-        $command = "{$git_path} log --oneline | {$grep_path} '{$pattern}'";
-        $result = trim(shell_exec($command));
+        $git = new Git($git_path);
 
-        if ($result == null || $result == '') {
-            \cli\err("%rERROR: %wUnable to execute git command:\n");
-            \cli\err($command . "\n");
+        $data = $git->getCommitList($pattern, $grep_path);
+
+        if ($data == false) {
             die(1);
-        }
-
-        // process the results
-        $results = explode("\n", $result);
-        $commits = array();
-        $merges = 0;
-
-        foreach ($results as $commit) {
-
-            // skip empty lines
-            if (!strlen($commit) > 0) {
-                continue;
-            };
-
-            $tmp = explode(' ', $commit);
-
-            // build data elements
-            $hash = $tmp[0];
-            $code = trim($tmp[1], ':');
-
-            unset($tmp[0]);
-            unset($tmp[1]);
-
-            $desc = implode(' ', $tmp);
-
-            $commits[] = array($hash, $code, $desc);
-        }
-
-        // get a list of just merges
-        $command = "{$git_path} log --oneline --merges | {$grep_path} '{$pattern}'";
-        $result = trim(shell_exec($command));
-
-        if ($result === null) { // we could legitimately have no output
-            \cli\err("%rERROR: %wUnable to execute git command:\n");
-            \cli\err($command . "\n");
-            die(1);
-        }
-
-        // process the results
-        $results = explode("\n", $result);
-
-        foreach ($results as $result) {
-
-            // skip empty lines
-            if (!strlen($result) > 0) {
-                continue;
-            }
-
-            $tmp = explode(' ', $result);
-
-            $code = trim($tmp[1], ':');
-
-            $idx = 0;
-
-            foreach ($commits as $commit) {
-                if ($commit[1] == $code) {
-
-                    // update JIRA code entry
-                    $commit[1] = $code . ' (merge)';
-
-                    // replace array entry with this one
-                    $commits[$idx] = $commit;
-
-                    $merges++;
-                }
-
-                $idx++;
-            }
         }
 
         // output a list of commits
         $table = new \cli\Table();
         $table->setHeaders(array('Hash', 'JIRA Code', 'Description'));
-        $table->setRows($commits);
+        $table->setRows($data[0]);
         $table->display();
 
-        \cli\out("Commits found: " . count($commits) . "\n");
-        \cli\out("Merge commits: {$merges}\n");
+        \cli\out("Commits found: " . count($data[0]) . "\n");
+        \cli\out("Merge commits: {$data[1]}\n");
         \cli\out("Apply commits in reverse order (bottom to top)\n");
     }
 }

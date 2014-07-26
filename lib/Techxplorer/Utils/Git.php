@@ -490,4 +490,97 @@ class Git
             return true;
         }
     }
+
+    /**
+     * Get a list of commits matching the specified pattern
+     *
+     * @param string $pattern   the pattern to match against
+     * @param string $grep_path the path to the grep binary
+     *
+     * @return mixed array on success, false on failure
+     */
+    public function getCommitList($pattern, $grep_path)
+    {
+
+        // get a list of all of the commits
+        $command = "{$this->_git_path} log --oneline | {$grep_path} '{$pattern}'";
+        $result = trim(shell_exec($command));
+
+        if ($result == null || $result == '') {
+            \cli\err("%rERROR: %wUnable to execute git command:\n");
+            \cli\err($command . "\n");
+            return false;
+        }
+
+        // process the results
+        $results = explode("\n", $result);
+        $commits = array();
+        $merges = 0;
+
+        foreach ($results as $commit) {
+
+            // skip empty lines
+            if (!strlen($commit) > 0) {
+                continue;
+            };
+
+            $tmp = explode(' ', $commit);
+
+            // build data elements
+            $hash = $tmp[0];
+            $code = trim($tmp[1], ':');
+
+            unset($tmp[0]);
+            unset($tmp[1]);
+
+            $desc = implode(' ', $tmp);
+
+            $commits[] = array($hash, $code, $desc);
+        }
+
+        // get a list of just merges
+        $command = "{$this->_git_path} log --oneline --merges " .
+            "| {$grep_path} '{$pattern}'";
+        $result = trim(shell_exec($command));
+
+        if ($result === null) { // we could legitimately have no output
+            \cli\err("%rERROR: %wUnable to execute git command:\n");
+            \cli\err($command . "\n");
+            return false;
+        }
+
+        // process the results
+        $results = explode("\n", $result);
+
+        foreach ($results as $result) {
+
+            // skip empty lines
+            if (!strlen($result) > 0) {
+                continue;
+            }
+
+            $tmp = explode(' ', $result);
+
+            $code = trim($tmp[1], ':');
+
+            $idx = 0;
+
+            foreach ($commits as $commit) {
+                if ($commit[1] == $code) {
+
+                    // update JIRA code entry
+                    $commit[1] = $code . ' (merge)';
+
+                    // replace array entry with this one
+                    $commits[$idx] = $commit;
+
+                    $merges++;
+                }
+
+                $idx++;
+            }
+        }
+
+        return array($commits, $merges);
+    }
 }
