@@ -63,7 +63,7 @@ class GitMergeContents
     /** 
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.1';
+    const SCRIPT_VERSION = 'v1.0.2';
 
     /**
      * defines the uri for more information
