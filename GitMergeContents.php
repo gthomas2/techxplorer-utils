@@ -39,6 +39,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 use \Techxplorer\Utils\Files as Files;
 use \Techxplorer\Utils\System as System;
 use \Techxplorer\Utils\Git as Git;
+use \Techxplorer\Utils\Pasteboard as Pasteboard;
 
 use \Techxplorer\Utils\FileNotFoundException;
 
@@ -161,9 +162,35 @@ class GitMergeContents
             die(1);
         }
 
+        // initialise the pastboard class
+        try {
+            $pasteboard = new PasteBoard();
+        } catch (Exception $e) {
+            $pasteboard = false;
+        }
+
         // output some helper text
         \cli\out("Searching for commit: {$commit_hash}\n");
         \cli\out("Using this git: {$git_path}\n");
+
+        // initialise the pasteboard class
+        if (System::isMacOSX()) {
+            try {
+                $pasteboard = new PasteBoard();
+            } catch (Exception $e) {
+                \cli\out(
+                    "%yWARNING: %wAutomatic copy to pasteboard disabled\n"
+                );
+
+                $pasteboard = false;
+            }
+        } else {
+            $pasteboard = false;
+        }
+
+        if ($pasteboard != false) {
+            \cli\out("Automatic copy to pasteboard enabled\n");
+        }
 
         // change to the repo path
         if (!chdir($repo_path)) {
@@ -191,10 +218,22 @@ class GitMergeContents
         \cli\out("\nImplements: \n");
         $tree = new \cli\Tree;
         $tree->setData($commits);
-        $tree->setRenderer(new \cli\tree\Markdown(2));
+        $renderer = new \cli\tree\Markdown(2);
+        $tree->setRenderer($renderer);
         $tree->display();
         \cli\out("\n");
         \cli\out("Number of items: " . count($commits) . "\n");
+
+        // automatically add the output to the pasteboard
+        if ($pasteboard != false) {
+            $data = "Implements:\n";
+            $data .= $renderer->render($commits);
+            if (!$pasteboard->put($data)) {
+                \cli\out(
+                    "%yWARNING: %wUnable to automatically copy to the pasteboard\n"
+                );
+            }
+        }
     }
 } 
 
