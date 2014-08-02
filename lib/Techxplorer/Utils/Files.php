@@ -175,58 +175,91 @@ class Files
         // if we get this far, the string didn't parse
         throw new InvalidArgumentException('The $value could not be parsed');
     }
-}
 
-/**
- * An exception to indicate a file was not found
- *
- * @category TechxplorerUtils
- * @package  TechxplorerUtils
- * @author   techxplorer <corey@techxplorer.com>
- * @license  http://opensource.org/licenses/GPL-3.0 GNU Public License v3.0
- * @link     https://github.com/techxplorer/techxplorer-utils
- */
-class FileNotFoundException extends \RuntimeException
-{
     /**
-     * Constructor
+     * Recursively search the file system looking for files
      *
-     * @param string $path The path to the file that was not found
+     * start at the specified $parent_dir and if required filter by $extension
+     *
+     * @param string $parent_dir the parent directory to search
+     * @param string $extension an optional file name extension used to filter results
+     *
+     * @return array a string array of matching files, or null on failure
+     *
+     * @throws InvalidArgumentException if the $parent_dir parameter is null
+     * @throws InvalidArgumentException if the $parent_dir cannot be accessed
      */
-    public function __construct($path)
-    {
-        parent::__construct(
-            sprintf(
-                'The file "%s" does not exist',
-                $path
-            )
-        );
-    }
-}
+    public static function findFiles($parent_dir, $extension=null) {
 
-/**
- * An exception to indicate a config file could not be parsed
- *
- * @category TechxplorerUtils
- * @package  TechxplorerUtils
- * @author   techxplorer <corey@techxplorer.com>
- * @license  http://opensource.org/licenses/GPL-3.0 GNU Public License v3.0
- * @link     https://github.com/techxplorer/techxplorer-utils
- */
-class ConfigParseException extends \RuntimeException
-{
-    /**
-     * Constructor
-     *
-     * @param string $path The path to the file that failed parsing
-     */
-    public function __construct($path)
-    {
-        parent::__construct(
-            sprintf(
-                'The config file "%s" could not be parsed',
-                $path
-            )
-        );
+        // check on the parameters
+        if($parent_dir == null || trim($parent_dir) == false) {
+            throw new \InvalidArgumentException("the parent_dir parameter cannot be null");
+        }
+
+        // ensure path ends in slash
+        if (substr($parent_dir, -1) != '/') {
+            $parent_dir .= '/';
+        }
+
+        // check to make sure that the directory exists
+        if(file_exists($parent_dir) == false) {
+            throw new FileNotFoundException("unable to access the specified directory: '$parent_dir'");
+        }
+
+        // store the length of the extension for later
+        if ($extension != null) {
+            $ext_length = strlen($extension) * -1;
+        }
+
+        // store lists of files and directories
+        $files = array();
+        $directories = array();
+        array_push($directories, $parent_dir);
+
+        // loop through the list of directories
+        while(count($directories) > 0) {
+
+            // open a handle to the next directory
+            $directory = array_shift($directories);
+            $dir_handle = opendir($directory);
+
+            // check to make sure we got a directory handle
+            if($dir_handle == false) {
+                return null;
+            }
+
+            // list all of the files
+            while (false !== ($file = readdir($dir_handle))) {
+
+                // build the entire path
+                $file = $directory . $file;
+
+                // skip the . and .. files
+                if($file == "$directory." || $file == "$directory..") {
+                    continue;
+                }
+
+                // check to see if this is a file or directory
+                if(is_dir($file) == true) {
+                    // this is a directory, add it to the list of directories
+                    array_push($directories, $file . "/");
+
+                } else {
+                    // check to see if this file matches the extension, if required
+                    if($extension != null) {
+                        if (substr($file, $ext_length) == $extension) {
+                            // store the file
+                            array_push($files, $file);
+                        }
+                    } else {
+                        // store the file
+                        array_push($files, $file);
+                    }
+                }
+            }
+        }
+
+        // return the list of files
+        return $files;
     }
 }
