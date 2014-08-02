@@ -118,6 +118,14 @@ class MdlLangConvert
             )
         );
 
+        $arguments->addOption(
+            array('skip', 's'),
+            array(
+                'default' => '',
+                'description' => 'Comma seperated list of replacements to skip'
+            )
+        );
+
         $arguments->addFlag(
             array('help', 'h'),
             'Show this help screen'
@@ -128,6 +136,12 @@ class MdlLangConvert
 
         if ($arguments['help']) {
             \cli\out($arguments->getHelpScreen());
+            \cli\out("\n");
+            \cli\out("The skip list is a list of terms that when they are the\n");
+            \cli\out("only deletions and inserts the customisation is skipped.\n");
+            \cli\out("For example: course,site\n");
+            \cli\out("If %rcourse%w is replaced with %gsite%w and this is the\n");
+            \cli\out("only difference, the customisation would be skipped\n");
             \cli\out("\n");
             die(0);
         }
@@ -176,6 +190,32 @@ class MdlLangConvert
                 \cli\err("\n");
                 die(1);
             }
+        }
+
+        $skip = false;
+        $skip_inserts = array();
+        $skip_deletes = array();
+
+        if ($arguments['skip']) {
+            $skip_list = explode(',', $arguments['skip']);
+
+            if (count($skip_list) % 2 != 0) {
+                \cli\err(
+                    "%rERROR: %wThe skip list must be an even number of terms\n"
+                );
+                \cli\err("\n");
+                die(1);
+            }
+
+            for ($i = 0; $i < count($skip_list); $i++) {
+                if ($i %2 == 0) {
+                    $skip_inserts[] = $skip_list[$i] . ' ';
+                } else {
+                    $skip_deletes[] = $skip_list[$i] . ' ';
+                }
+            }
+
+            $skip = true;
         }
 
         /*
@@ -260,7 +300,15 @@ class MdlLangConvert
 
         // process each of the customisations
         foreach ($lang_data->getDiffs() as $key => $diff) {
+
             \cli\out("Key: $key\n");
+
+            if ($skip && $this->_shouldSkip($skip_deletes, $skip_inserts, $diff)) {
+                \cli\out("Skipping customisation\n");
+                $skipped++;
+                continue;
+            }
+
             \cli\out("$diff\n");
             $confirmed = \cli\confirm("Add this customisation");
 
@@ -279,6 +327,41 @@ class MdlLangConvert
         \cli\out("%gSUCCESS: %wSuccessfully update translation file\n");
         \cli\out("         Customisations added: $added\n");
         \cli\out("         Customisations skipped: $skipped\n");
+    }
+
+    /**
+     * Determine if this customisation should be skipped
+     *
+     * @param array  $skip_inserts a list of inserts
+     * @param array  $skip_deletes a list of deletes
+     * @param string $diff         the diff of the customisation
+     *
+     * @return boolean true if it should be skipped, false if it should not
+     */
+    private function _shouldSkip($skip_inserts, $skip_deletes, $diff)
+    {
+        $diff = strtolower($diff);
+        foreach ($skip_deletes as $delete) {
+            $diff = str_replace(
+                '%r' . $delete . '%w',
+                '',
+                $diff
+            );
+        }
+
+        foreach ($skip_inserts as $insert) {
+            $diff = str_replace(
+                '%g' . $insert . '%w',
+                '',
+                $diff
+            );
+        }
+
+        if (strpos($diff, '%w') === false) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 
