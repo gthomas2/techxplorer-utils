@@ -224,7 +224,7 @@ class Logger
             }
         }
 
-        return true;
+        return $this->writeLine('');
     }
 
     /**

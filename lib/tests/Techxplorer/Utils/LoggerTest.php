@@ -277,6 +277,7 @@ class LoggerTest extends PHPUnit_Framework_TestCase
         foreach ($list as $l) {
             $expected .= '- ' . $l . "\n";
         }
+        $expected .= "\n";
 
         $log->writeList($list);
 
