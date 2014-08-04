@@ -148,16 +148,29 @@ class Logger
             $marker .= '=';
         }
 
-        $written = fwrite(
-            $this->_handle,
-            $marker . ' ' . $heading . ' ' . $marker . "\n"
-        );
+        $header = "$marker $heading $marker\n";
 
-        if ($written === false) {
-            return false;
-        } else {
-            return true;
+        return $this->writeLine($header);
+    }
+
+    /**
+     * Write a paragraph to the log file
+     *
+     * @param string $paragraph the paragraph to write to the log file
+     *
+     * @return boolean true on success, false on failure
+     *
+     * @throws \InvalidArgumetException
+     */
+    public function writeParagraph($paragraph)
+    {
+        if ($paragraph == null || trim($paragraph) == '') {
+            throw new \InvalidArgumentException(
+                'The $paragraph argument must be a valid string'
+            );
         }
+
+        return $this->writeLine($paragraph . "\n");
     }
 
     /**
@@ -166,17 +179,9 @@ class Logger
      * @param string $line the line to write to the log file
      *
      * @return boolean true on success, false on failure
-     *
-     * @throws \InvalidArgumentException
      */
     public function writeLine($line)
     {
-        if ($line == null || trim($line) == '') {
-            throw new \InvalidArgumentException(
-                'The $heading argument must be a valid string'
-            );
-        }
-
         $written = fwrite(
             $this->_handle,
             $line . "\n"

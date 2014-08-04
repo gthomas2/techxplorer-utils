@@ -116,21 +116,21 @@ class LoggerTest extends PHPUnit_Framework_TestCase
         $log = new Logger($this->_path);
 
         $heading  = 'This is a heading';
-        $expected = "= This is a heading =\n";
+        $expected = "= This is a heading =\n\n";
 
         $log->writeHeading($heading, 1);
         $this->assertStringEqualsFile($this->_path, $expected);
 
         $log->writeHeading($heading, 2);
-        $expected .= "== This is a heading ==\n";
+        $expected .= "== This is a heading ==\n\n";
         $this->assertStringEqualsFile($this->_path, $expected);
 
         $log->writeHeading($heading, 3);
-        $expected .= "=== This is a heading ===\n";
+        $expected .= "=== This is a heading ===\n\n";
         $this->assertStringEqualsFile($this->_path, $expected);
 
         $log->writeHeading($heading, 4);
-        $expected .= "==== This is a heading ====\n";
+        $expected .= "==== This is a heading ====\n\n";
         $this->assertStringEqualsFile($this->_path, $expected);
     }
 
@@ -190,7 +190,47 @@ class LoggerTest extends PHPUnit_Framework_TestCase
         $log->writeHeading('heading', 1.1);
     }
 
+    /**
+     * Test the writeParagraph function
+     *
+     * @return void;
+     */
+    public function testWriteParagraph()
+    {
+        $log = new Logger($this->_path);
 
+        $paragraph = 'This is a paragraph';
+        $expected  = "This is a paragraph\n\n";
+
+        $log->writeParagraph($paragraph);
+        $this->assertStringEqualsFile($this->_path, $expected);
+    }
+
+    /**
+     * Test the write paragraph function
+     *
+     * @expectedException InvalidArgumentException
+     *
+     * @return void
+     */
+    public function testWriteParagraphTwo()
+    {
+        $log = new Logger($this->_path);
+        $log->writeParagraph('');
+    }
+
+    /**
+     * Test the write paragraph function
+     *
+     * @expectedException InvalidArgumentException
+     *
+     * @return void
+     */
+    public function testWriteParagraphThree()
+    {
+        $log = new Logger($this->_path);
+        $log->writeParagraph('    ');
+    }
     /**
      * Test the writeLine function
      *
@@ -209,32 +249,11 @@ class LoggerTest extends PHPUnit_Framework_TestCase
         $log->writeLine($line);
         $expected .= "$line\n";
         $this->assertStringEqualsFile($this->_path, $expected);
-    }
 
-    /**
-     * Test the writeLine function
-     *
-     * @expectedException InvalidArgumentException
-     *
-     * @return void
-     */
-    public function testWriteLineTwo()
-    {
-        $log = new Logger($this->_path);
-        $log->writeLine('');
-    }
-
-    /**
-     * Test the writeLine function
-     *
-     * @expectedException InvalidArgumentException
-     *
-     * @return void
-     */
-    public function testWriteLineThree()
-    {
-        $log = new Logger($this->_path);
-        $log->writeLine('   ');
+        $line .= '';
+        $log->writeLine($line);
+        $expected .= "$line\n";
+        $this->assertStringEqualsFile($this->_path, $expected);
     }
 
     /**
