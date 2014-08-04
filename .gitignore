@@ -3,3 +3,8 @@ composer.phar
 vendor
 data/*.json
 *.swp
+
+# non readable files required for tests
+lib/tests/data/not-writable.txt
+lib/tests/data/not-writable/
+lib/tests/data/not-writable/.gitignore

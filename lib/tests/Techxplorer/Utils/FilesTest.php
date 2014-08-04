@@ -289,7 +289,7 @@ class FilesTests extends PHPUnit_Framework_TestCase
     /**
      * Specify the default number of expected files
      */
-    const DEFAULT_FILE_COUNT = 7;
+    const DEFAULT_FILE_COUNT = 9;
 
     /**
      * Specify the default number of expected files when
