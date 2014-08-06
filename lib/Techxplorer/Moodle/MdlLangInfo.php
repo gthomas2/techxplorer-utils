@@ -49,6 +49,48 @@ class MdlLangInfo
 
     private $_stats = array();
 
+    private $_type = -1;
+
+    /**
+     * Constant representing a core Moodle file
+     */
+    const TYPE_CORE = 0;
+
+    /**
+     * Constant representing a lang file for a block
+     */
+    const TYPE_BLOCK = 1;
+
+    /**
+     * Constant representing a lang file for a mod
+     */
+    const TYPE_MOD = 2;
+
+    /**
+     * Constant representing a lang file for a enrol plugin
+     */
+    const TYPE_ENROL = 3;
+
+    /**
+     * Constant representing a lang file for a repository plugin
+     */
+    const TYPE_REPOSITORY = 4;
+
+    /**
+     * Constant representing a lang file for a report plugin
+     */
+    const TYPE_REPORT = 5;
+
+    /**
+     * Constant representing a lang file for an auth plugin
+     */
+    const TYPE_AUTH = 6;
+
+    /**
+     * Constant representing a lang file for an unknown type
+     */
+    const TYPE_UNKNOWN = -1;
+
     /**
      * Construct a new MdlLangInfo object
      *
@@ -284,5 +326,41 @@ class MdlLangInfo
     public function getStatsCount()
     {
         return count($this->_stats);
+    }
+
+    /**
+     * Set the plugin type for this lang file
+     *
+     * @param int $type the plugin type
+     *
+     * @return void
+     *
+     * @throws \InvalidArgumentException if type is not one of the named constants
+     */
+    public function setPluginType($type)
+    {
+        if (!is_numeric($type)) {
+            throw new \InvalidArgumentException(
+                'Invalid plugin type detected'
+            );
+        }
+
+        if ($type >= -1 && $type <= 6) {
+            $this->_type = $type;
+        } else {
+            throw new \InvalidArgumentException(
+                'Invalid plugin type detected'
+            );
+        }
+    }
+
+    /**
+     * Get the plugin type that this lang file belongs to
+     *
+     * @return int the plugin type
+     */
+    public function getPluginType()
+    {
+        return $this->_type;
     }
 }

@@ -40,6 +40,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 // shorten namespaces
 use \Techxplorer\Utils\Files;
 use \Techxplorer\Utils\System;
+use \Techxplorer\Utils\Logger;
 
 use \Techxplorer\Moodle\MdlLangInfo;
 use \Techxplorer\Moodle\MdlLangComparator;
@@ -111,18 +112,26 @@ class MdlLangConvert
         );
 
         $arguments->addOption(
-            array('xml', 'x'),
-            array(
-                'default' => '',
-                'description' => 'The path to the translation.xml file'
-            )
-        );
-
-        $arguments->addOption(
             array('skip', 's'),
             array(
                 'default' => '',
                 'description' => 'Comma seperated list of replacements to skip'
+            )
+        );
+
+        $arguments->addOption(
+            array('log', 'l'),
+            array(
+                'default' => '',
+                'description' => 'The path to the log file'
+            )
+        );
+
+        $arguments->addOption(
+            array('xml', 'x'),
+            array(
+                'default' => '',
+                'description' => 'The path to the translation.xml file'
             )
         );
 
@@ -138,7 +147,7 @@ class MdlLangConvert
             \cli\out($arguments->getHelpScreen());
             \cli\out("\n");
             \cli\out("The skip list is a list of terms that when they are the\n");
-            \cli\out("only deletions and inserts the customisation is skipped.\n");
+            \cli\out("only delettions & insertions the customisation is skipped.\n");
             \cli\out("For example: course,site\n");
             \cli\out("If %rcourse%w is replaced with %gsite%w and this is the\n");
             \cli\out("only difference, the customisation would be skipped\n");
@@ -218,7 +227,28 @@ class MdlLangConvert
             $skip = true;
         }
 
-        /*
+        $log = null;
+
+        if ($arguments['log']) {
+            try {
+                $log = new Logger($arguments['log']);
+            } catch (Exception $e) {
+                \cli\err("%rERROR: %wUnable to start logging\n");
+                \cli\err($e->getMessage() . "\n");
+                die(1);
+            }
+        }
+
+        if ($log != null && $log->isNewLog()) {
+            $log->writeHeading(
+                'Log created by: ' .
+                self::SCRIPT_NAME .
+                ' - ' .
+                self::SCRIPT_VERSION,
+                1
+            );
+        }
+
         if (!$arguments['xml']) {
             \cli\err("%rERROR: %wMissing required argument --xml\n");
             \cli\err($arguments->getHelpScreen());
@@ -240,10 +270,32 @@ class MdlLangConvert
                 \cli\err("\n");
                 die(1);
             }
-        }
-        */
 
-         // fake a moodle install
+            try {
+                $xmllint_path = Files::findApp('xmllint');
+
+                $command = "{$xmllint_path} --noout {$xml_path} 2>&1";
+
+                $output = array();
+                $return_var = '';
+                exec($command, $output, $return_var);
+
+                // check to see if the xml is well formed
+                if ($return_var != 0) {
+                    \cli\err(
+                        "%rERROR: %wThe file specified by --xml" .
+                        " is not well formed xml\n"
+                    );
+                    die(1);
+                }
+            } catch (FileNotFoundException $ex) {
+                \cli\err(
+                    "%yWARNING: unable to find xmllint, assuming xml is valid\n"
+                );
+            }
+        }
+
+        // fake a moodle install
         define('MOODLE_INTERNAL', true);
 
         // instantiate the comparator class, which will do the comparison
@@ -267,8 +319,6 @@ class MdlLangConvert
                 die(1);
             }
         }
-
-        //TODO load the xml file
 
         // calculate the differences in the strings if required
         $lang_data->getUnusedKeys();
@@ -295,8 +345,8 @@ class MdlLangConvert
             );
         }
 
-        $added   = 0;
-        $skipped = 0;
+        $added   = array();
+        $skipped = array();
 
         // process each of the customisations
         foreach ($lang_data->getDiffs() as $key => $diff) {
@@ -305,7 +355,7 @@ class MdlLangConvert
 
             if ($skip && $this->_shouldSkip($skip_deletes, $skip_inserts, $diff)) {
                 \cli\out("Skipping customisation\n");
-                $skipped++;
+                $skipped[] = $key;
                 continue;
             }
 
@@ -313,20 +363,81 @@ class MdlLangConvert
             $confirmed = \cli\confirm("Add this customisation");
 
             if ($confirmed) {
-                //TODO add the string to the xml file
-                \cli\out("%yWARNING: %wnot written yet\n");
-                $added++;
+                $added[] = $key;
             } else {
                 \cli\out("Skipping customisation\n");
-                $skipped++;
+                $skipped[] = $key;
             }
         }
 
-        // TODO close the xml file
-        //
-        \cli\out("%gSUCCESS: %wSuccessfully update translation file\n");
-        \cli\out("         Customisations added: $added\n");
-        \cli\out("         Customisations skipped: $skipped\n");
+        // update the xml file
+        try {
+            $this->_updateXML($xml_path, $lang_data, $added);
+        } catch (Exception $e) {
+            \cli\err("%rERROR: %wUnable to update the xml file\n");
+            \cli\err($e->getMessage());
+            die(1);
+        }
+
+        // Write the log file
+        if ($log != null) {
+            $log->writeHeading('Processed lang file', 2);
+            $log->writeParagraph(date('Y-m-d'));
+            $log->writeParagraph($custom_path);
+            $log->writeHeading('Skipped keys', 3);
+            $log->writeList($skipped);
+            $log->writeHeading('Added keys', 3);
+            $log->writeList($added);
+        }
+
+        \cli\out("%gSUCCESS: %wSuccessfully updated translation file\n");
+        \cli\out("         Customisations added: " . count($added) ."\n");
+        \cli\out("         Customisations skipped: " . count($skipped) ."\n");
+    }
+
+    /**
+     * Update the xml file with the translations
+     *
+     * @param string      $xml_path  path to the xml file
+     * @param MdlLangInfo $lang_data the string cusomisation data
+     * @param array       $added     keys of the added customisations
+     *
+     * @return void;
+     */
+    private function _updateXML($xml_path, $lang_data, $added)
+    {
+        // determine the name of the node
+        $node_name = basename($lang_data->getCustomPath(), '.php');
+        $translations = $lang_data->getCustomStrings();
+
+        // adjust the node name if required
+        if ($lang_data->getPluginType() == $lang_data::TYPE_CORE) {
+            $node_name = 'core_' . $node_name;
+        }
+
+        // build a list of new nodes
+        $new_dom = new \DOMDocument('1.0', 'UTF-8');
+        $new_translation = $new_dom->createElement($node_name);
+        $new_dom->appendChild($new_translation);
+
+        foreach ($added as $to_add) {
+            $replace_node = $new_dom->createElement('replace');
+            $replace_attr = $new_dom->createAttribute('id');
+            $replace_attr->value = $to_add;
+            $replace_node->appendChild($replace_attr);
+            $replace_node->nodeValue = $translations[$to_add];
+            $new_translation->appendChild($replace_node);
+        }
+
+        // load the old xml and import the new translations
+        $old_dom = new \DOMDocument('1.0', 'UTF-8');
+        $old_dom->preserveWhiteSpace = false;
+        $old_dom->formatOutput = true;
+        $old_dom->load($xml_path);
+        $root_node = $old_dom->getElementsByTagName('translation')->item(0);
+        $imported_node = $old_dom->importNode($new_translation, true);
+        $root_node->appendChild($imported_node);
+        $old_dom->save($xml_path);
     }
 
     /**
@@ -342,17 +453,17 @@ class MdlLangConvert
     {
         $diff = strtolower($diff);
         foreach ($skip_deletes as $delete) {
-            $diff = str_replace(
-                '%r' . $delete . '%w',
-                '',
+            $diff = $this->_filterDiff(
+                '%r',
+                $delete,
                 $diff
             );
         }
 
         foreach ($skip_inserts as $insert) {
-            $diff = str_replace(
-                '%g' . $insert . '%w',
-                '',
+            $diff = $this->_filterDiff(
+                '%g',
+                $insert,
                 $diff
             );
         }
@@ -362,6 +473,46 @@ class MdlLangConvert
         } else {
             return false;
         }
+    }
+
+    /**
+     * private function to help in determining if a change should be skipped
+     *
+     * @param string $prefix the prefix of the change
+     * @param string $change the text of the change
+     * @param string $diff   the actual diff
+     *
+     * @return string the filtered diff
+     */
+    private function _filterDiff($prefix, $change, $diff)
+    {
+        $diff = str_replace(
+            $prefix . $change . '%w',
+            '',
+            $diff
+        );
+
+        $diff = str_replace(
+            $prefix . trim($change) . '%w',
+            '',
+            $diff
+        );
+
+        static $punctuation = array(
+            '.',
+            ')',
+        );
+
+        foreach ($punctuation as $p) {
+
+            $diff = str_replace(
+                $prefix . trim($change) . $p . '%w',
+                '',
+                $diff
+            );
+        }
+
+        return $diff;
     }
 }
 

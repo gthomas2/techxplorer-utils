@@ -53,6 +53,8 @@ class MdlLangComparator
 {
     private $_moodle_path;
 
+    private $_lookup_table;
+
     /**
      * Constructor for the class
      *
@@ -67,6 +69,7 @@ class MdlLangComparator
         }
 
         $this->_moodle_path = $moodle_path;
+        $this->_lookup_table = array();
     }
 
     /**
@@ -118,6 +121,10 @@ class MdlLangComparator
                 );
                 if ($new_path != false) {
                     $paths[] = array($new_path, $custom_path);
+                    $hash = md5($custom_path);
+                    $this->_lookup_table[$hash] = array(
+                        'type' => MdlLangInfo::TYPE_BLOCK
+                    );
                 } else {
                     $skipped_paths[] = $custom_path;
                 }
@@ -130,6 +137,10 @@ class MdlLangComparator
                 );
                 if ($new_path != false) {
                     $paths[] = array($new_path, $custom_path);
+                    $hash = md5($custom_path);
+                    $this->_lookup_table[$hash] = array(
+                        'type' => MdlLangInfo::TYPE_ENROL
+                    );
                 } else {
                     $skipped_paths[] = $custom_path;
                 }
@@ -142,6 +153,10 @@ class MdlLangComparator
                 );
                 if ($new_path != false) {
                     $paths[] = array($new_path, $custom_path);
+                    $hash = md5($custom_path);
+                    $this->_lookup_table[$hash] = array(
+                        'type' => MdlLangInfo::TYPE_REPORT
+                    );
                 } else {
                     $skipped_paths[] = $custom_path;
                 }
@@ -154,6 +169,10 @@ class MdlLangComparator
                 );
                 if ($new_path != false) {
                     $paths[] = array($new_path, $custom_path);
+                    $hash = md5($custom_path);
+                    $this->_lookup_table[$hash] = array(
+                        'type' => MdlLangInfo::TYPE_REPOSITORY
+                    );
                 } else {
                     $skipped_paths[] = $custom_path;
                 }
@@ -166,18 +185,30 @@ class MdlLangComparator
                 );
                 if ($new_path != false) {
                     $paths[] = array($new_path, $custom_path);
+                    $hash = md5($custom_path);
+                    $this->_lookup_table[$hash] = array(
+                        'type' => MdlLangInfo::TYPE_AUTH
+                    );
                 } else {
                     $skipped_paths[] = $custom_path;
                 }
             } else if (is_file($this->_moodle_path . "/$file_name")) {
                 // this is a core moodle file
                 $paths[] = array($this->_moodle_path . "/$file_name", $custom_path);
+                $hash = md5($custom_path);
+                $this->_lookup_table[$hash] = array(
+                    'type' => MdlLangInfo::TYPE_CORE
+                );
             } else {
                 // is this a module?
                 $dir = basename($file_name, '.php');
                 $new_path = $mod_path . "/$dir/lang/en/$file_name";
                 if (is_file($new_path)) {
                     $paths[] = array($new_path, $custom_path);
+                    $hash = md5($custom_path);
+                    $this->_lookup_table[$hash] = array(
+                        'type' => MdlLangInfo::TYPE_MOD
+                    );
                 } else {
                     // must be something else
                     $skipped_paths[] = $custom_path;
@@ -340,6 +371,7 @@ class MdlLangComparator
         // add the strings the data object
         $data->setMoodleStrings($moodle_strings);
         $data->setCustomStrings($custom_strings);
+        $data->setPluginType($this->_lookup_table[md5($custom_path)]['type']);
 
         return $data;
     }

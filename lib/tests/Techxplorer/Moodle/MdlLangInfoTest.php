@@ -212,4 +212,88 @@ class MdlLangInfoTests extends PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $new_object->getStats());
         $this->assertEquals(0, $new_object->getStatsCount());
     }
+
+    /**
+     * Test the plugin type related methods
+     *
+     * @param MdlLangInfo $object an instantiated MdLangInfo object
+     *
+     * @depends testMdlLangInfo
+     *
+     * @return void
+     */
+    public function testPluginType(MdlLangInfo $object)
+    {
+        $object->setPluginType(MdlLangInfo::TYPE_CORE);
+        $this->assertEquals(MdlLangInfo::TYPE_CORE, $object->getPluginType());
+
+        $object->setPluginType(MdlLangInfo::TYPE_BLOCK);
+        $this->assertEquals(MdlLangInfo::TYPE_BLOCK, $object->getPluginType());
+
+        $object->setPluginType(MdlLangInfo::TYPE_MOD);
+        $this->assertEquals(MdlLangInfo::TYPE_MOD, $object->getPluginType());
+
+        $object->setPluginType(MdlLangInfo::TYPE_ENROL);
+        $this->assertEquals(MdlLangInfo::TYPE_ENROL, $object->getPluginType());
+
+        $object->setPluginType(MdlLangInfo::TYPE_REPOSITORY);
+        $this->assertEquals(MdlLangInfo::TYPE_REPOSITORY, $object->getPluginType());
+
+        $object->setPluginType(MdlLangInfo::TYPE_REPORT);
+        $this->assertEquals(MdlLangInfo::TYPE_REPORT, $object->getPluginType());
+
+        $object->setPluginType(MdlLangInfo::TYPE_AUTH);
+        $this->assertEquals(MdlLangInfo::TYPE_AUTH, $object->getPluginType());
+
+        $object->setPluginType(MdlLangInfo::TYPE_UNKNOWN);
+        $this->assertEquals(MdlLangInfo::TYPE_UNKNOWN, $object->getPluginType());
+    }
+
+    /**
+     * Test the plugin type related methods
+     *
+     * @param MdlLangInfo $object an instantiated MdLangInfo object
+     *
+     * @expectedException InvalidArgumentException
+     *
+     * @depends testMdlLangInfo
+     *
+     * @return void
+     */
+    public function testPluginTypeTwo(MdlLangInfo $object)
+    {
+        $object->setPluginType('a');
+    }
+
+    /**
+     * Test the plugin type related methods
+     *
+     * @param MdlLangInfo $object an instantiated MdLangInfo object
+     *
+     * @expectedException InvalidArgumentException
+     *
+     * @depends testMdlLangInfo
+     *
+     * @return void
+     */
+    public function testPluginTypeThree(MdlLangInfo $object)
+    {
+        $object->setPluginType(101);
+    }
+
+    /**
+     * Test the plugin type related methods
+     *
+     * @param MdlLangInfo $object an instantiated MdLangInfo object
+     *
+     * @expectedException InvalidArgumentException
+     *
+     * @depends testMdlLangInfo
+     *
+     * @return void
+     */
+    public function testPluginTypeFour(MdlLangInfo $object)
+    {
+        $object->setPluginType(-101);
+    }
 }
