@@ -116,11 +116,11 @@ class MdlLangCompare
         );
 
         $arguments->addOption(
-            array('occurances', 'o'),
+            array('occurrences', 'o'),
             array(
                 'default' => self::DEFAULT_OCCURANCES,
                 'description' =>
-                'Limit occurances to this and above for output in stats'
+                'Limit occurrences to this and above for output in stats'
             )
         );
 
@@ -179,17 +179,17 @@ class MdlLangCompare
         }
 
         // determine the occurance limit
-        if (!$arguments['occurances']) {
+        if (!$arguments['occurrences']) {
             $occurances = self::DEFAULT_OCCURANCES;
         } else {
-            if (!is_numeric($arguments['occurances'])) {
-                \cli\err("%rERROR: %wThe occurances limit must be a number\n");
+            if (!is_numeric($arguments['occurrences'])) {
+                \cli\err("%rERROR: %wThe occurrences limit must be a number\n");
                 \cli\err("\n");
                 die(1);
             }
-            $occurances = (int) $arguments['occurances'];
+            $occurances = (int) $arguments['occurrences'];
             if ($occurances < 0) {
-                \cli\err("%rERROR: %wThe occurances limit must be grater than 0\n");
+                \cli\err("%rERROR: %wThe occurrences limit must be grater than 0\n");
                 \cli\err("\n");
                 die(1);
             }
