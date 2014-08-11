@@ -285,4 +285,73 @@ class FilesTests extends PHPUnit_Framework_TestCase
         // unrecognised string
         Files::convertSize('1TB');
     } 
+
+    /**
+     * Specify the default number of expected files
+     */
+    const DEFAULT_FILE_COUNT = 9;
+
+    /**
+     * Specify the default number of expected files when
+     * a filter is applied
+     */
+    const DEFAULT_FILTER_FILE_COUNT = 2;
+
+    /**
+     * Test the findFiles function when the parent directory isn't available
+     *
+     * @expectedException \Techxplorer\Utils\FileNotFoundException
+     */
+    public function test_findFiles_parent_not_found() {
+       // test the case where the path cannot be read
+       Files::findFiles('../directory-not-here/');
+    }
+
+    /**
+     * Test the findFiles function without a filter
+     */
+    public function test_findFiles_no_filter() {
+        global $CFG;
+        //debug code
+        //var_dump(Files::find_files('./data'));
+
+        // test that the file list matches what is expected with no filter
+        $this->assertCount(self::DEFAULT_FILE_COUNT, Files::findFiles($CFG->data_root)); // with missing tail slash
+        $this->assertCount(self::DEFAULT_FILE_COUNT, Files::findFiles($CFG->data_root . '/')); // with included tail slash
+    }
+
+    /**
+     * Test the findFiles function with a filter
+     */
+    public function test_findFiles_with_filter() {
+        global $CFG;
+
+        // test that the file list matches what is expected with a filter
+        $this->assertCount(self::DEFAULT_FILTER_FILE_COUNT, Files::findFiles($CFG->data_root, '.json')); // with missing tail slash
+        $this->assertCount(self::DEFAULT_FILTER_FILE_COUNT, Files::findFiles($CFG->data_root . '/', '.json')); // with included tail slash
+     }
+
+    /**
+     * Test the parameter checking code of the findFiles function
+     * @expectedException InvalidArgumentException
+     */
+    public function test_findFiles_exception_one() {
+        Files::findFiles(null);
+    }
+
+    /**
+     * Test the parameter checking code of the findFiles function
+     * @expectedException InvalidArgumentException
+     */
+    public function test_findFiles_exception_two() {
+        Files::findFiles(null, '.md');
+    }
+
+    /**
+     * Test the parameter checking code of the findFiles function
+     * @expectedException InvalidArgumentException
+     */
+     public function test_findFiles_exception_three() {
+         Files::findFiles('', '.md');
+     }
 }

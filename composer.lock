@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "07e59c225e07406d67583a0d50f5c176",
+    "hash": "75701f91cf3725186ee9559b0c99b4e1",
     "packages": [
         {
             "name": "behat/gherkin",
@@ -68,16 +68,16 @@
         },
         {
             "name": "chobie/jira-api-restclient",
-            "version": "dev-master",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/chobie/jira-api-restclient.git",
-                "reference": "87d6dea6211199d5702c03fb6797841958e95c91"
+                "reference": "68c082d2bbcab5e9ba97e8b46496b3b1afceed6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chobie/jira-api-restclient/zipball/87d6dea6211199d5702c03fb6797841958e95c91",
-                "reference": "87d6dea6211199d5702c03fb6797841958e95c91",
+                "url": "https://api.github.com/repos/chobie/jira-api-restclient/zipball/68c082d2bbcab5e9ba97e8b46496b3b1afceed6f",
+                "reference": "68c082d2bbcab5e9ba97e8b46496b3b1afceed6f",
                 "shasum": ""
             },
             "require": {
@@ -100,10 +100,9 @@
             ],
             "authors": [
                 {
-                    "name": "chobie",
+                    "name": "Shuhei Tanuma",
                     "email": "chobieeee@php.net",
-                    "homepage": "http://blog.stfalcon.com",
-                    "role": "Developer"
+                    "homepage": "http://blog.stfalcon.com"
                 }
             ],
             "description": "JIRA REST API.",
@@ -112,7 +111,58 @@
                 "jira",
                 "rest"
             ],
-            "time": "2014-07-14 12:00:02"
+            "time": "2014-07-27 11:40:44"
+        },
+        {
+            "name": "cogpowered/finediff",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cogpowered/FineDiff.git",
+                "reference": "339ddc8c3afb656efed4f2f0a80e5c3d026f8ea8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cogpowered/FineDiff/zipball/339ddc8c3afb656efed4f2f0a80e5c3d026f8ea8",
+                "reference": "339ddc8c3afb656efed4f2f0a80e5c3d026f8ea8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "*",
+                "phpunit/phpunit": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "cogpowered\\FineDiff": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rob Crowe",
+                    "email": "rob@cogpowered.com"
+                },
+                {
+                    "name": "Raymond Hill"
+                }
+            ],
+            "description": "PHP implementation of a Fine granularity Diff engine",
+            "homepage": "https://github.com/cogpowered/FineDiff",
+            "keywords": [
+                "diff",
+                "finediff",
+                "opcode",
+                "string",
+                "text"
+            ],
+            "time": "2014-05-19 10:25:02"
         },
         {
             "name": "rodneyrehm/plist",
@@ -165,12 +215,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "f868ecdbcc0276b6158dfbf08b9e98ce07f014e1"
+                "reference": "5a75366ae9ca8b4792cd0083e4ca4dff9fe96f1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/f868ecdbcc0276b6158dfbf08b9e98ce07f014e1",
-                "reference": "f868ecdbcc0276b6158dfbf08b9e98ce07f014e1",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/5a75366ae9ca8b4792cd0083e4ca4dff9fe96f1f",
+                "reference": "5a75366ae9ca8b4792cd0083e4ca4dff9fe96f1f",
                 "shasum": ""
             },
             "require": {
@@ -193,19 +243,17 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com",
-                    "homepage": "http://fabien.potencier.org",
-                    "role": "Lead Developer"
-                },
-                {
                     "name": "Symfony Community",
                     "homepage": "http://symfony.com/contributors"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
                 }
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-07-09 09:05:48"
+            "time": "2014-08-05 09:00:40"
         },
         {
             "name": "wp-cli/php-cli-tools",
@@ -213,12 +261,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-cli/php-cli-tools.git",
-                "reference": "3df6b929b7a19f9e9958ab733476b87fb418bce7"
+                "reference": "64f04319c680f16d6a69c782643a11ab6af3dcb3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-cli/php-cli-tools/zipball/3df6b929b7a19f9e9958ab733476b87fb418bce7",
-                "reference": "3df6b929b7a19f9e9958ab733476b87fb418bce7",
+                "url": "https://api.github.com/repos/wp-cli/php-cli-tools/zipball/64f04319c680f16d6a69c782643a11ab6af3dcb3",
+                "reference": "64f04319c680f16d6a69c782643a11ab6af3dcb3",
                 "shasum": ""
             },
             "require": {
@@ -255,20 +303,20 @@
                 "cli",
                 "console"
             ],
-            "time": "2014-07-14 07:59:50"
+            "time": "2014-08-04 21:19:08"
         },
         {
             "name": "yzalis/identicon",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yzalis/Identicon.git",
-                "reference": "a99fc2a3d018512f7914bc6f972952536c0f309b"
+                "reference": "0ecb24810136b8bdfe23ba04e29e7cedc273f747"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yzalis/Identicon/zipball/a99fc2a3d018512f7914bc6f972952536c0f309b",
-                "reference": "a99fc2a3d018512f7914bc6f972952536c0f309b",
+                "url": "https://api.github.com/repos/yzalis/Identicon/zipball/0ecb24810136b8bdfe23ba04e29e7cedc273f747",
+                "reference": "0ecb24810136b8bdfe23ba04e29e7cedc273f747",
                 "shasum": ""
             },
             "require": {
@@ -280,7 +328,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1-dev"
+                    "dev-master": "1.0-dev"
                 }
             },
             "autoload": {
@@ -305,7 +353,7 @@
                 "identicon",
                 "image"
             ],
-            "time": "2014-07-13 09:19:12"
+            "time": "2013-08-16 11:56:30"
         }
     ],
     "packages-dev": [],
@@ -317,7 +365,8 @@
         "symfony/yaml": 20,
         "behat/gherkin": 20,
         "chobie/jira-api-restclient": 20,
-        "rodneyrehm/plist": 20
+        "rodneyrehm/plist": 20,
+        "cogpowered/finediff": 20
     },
     "prefer-stable": false,
     "platform": [],

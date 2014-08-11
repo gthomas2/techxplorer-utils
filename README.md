@@ -29,6 +29,7 @@ These scripts use the following libraries, installed and managed using [Composer
 4. [behat/gherkin](https://github.com/Behat/Gherkin)
 5. [chobie/jira-api-restclient](https://github.com/chobie/jira-api-restclient)
 6. [rodneyrehm/plist](https://github.com/rodneyrehm/plist)
+7. [cogpowered/finediff](https://github.com/cogpowered/finediff)
 
 My thanks to the authors of, and contributors to, these libraries. My own development would not have been possible without them. 
 
