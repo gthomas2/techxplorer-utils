@@ -115,7 +115,7 @@ class MdlLangConvert
             array('skip', 's'),
             array(
                 'default' => '',
-                'description' => 'Comma seperated list of replacements to skip'
+                'description' => 'Comma separated list of replacements to skip'
             )
         );
 
