@@ -63,7 +63,7 @@ class GitResetRepo
     /** 
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.2';
+    const SCRIPT_VERSION = 'v1.0.3';
 
     /**
      * defines the uri for more information
@@ -118,6 +118,7 @@ class GitResetRepo
         if ($arguments['help']) {
             \cli\out($arguments->getHelpScreen());
             \cli\out("\n");
+            die(0);
         }
 
         if (!$arguments['branch']) {
