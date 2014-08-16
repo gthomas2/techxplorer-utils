@@ -182,18 +182,21 @@ class Files
      * start at the specified $parent_dir and if required filter by $extension
      *
      * @param string $parent_dir the parent directory to search
-     * @param string $extension an optional file name extension used to filter results
+     * @param string $extension  an optional file name extension
+     *                           used to filter results
      *
      * @return array a string array of matching files, or null on failure
      *
      * @throws InvalidArgumentException if the $parent_dir parameter is null
-     * @throws InvalidArgumentException if the $parent_dir cannot be accessed
+     * @throws FileNotFoundException    if the $parent_dir cannot be accessed
      */
-    public static function findFiles($parent_dir, $extension=null) {
-
+    public static function findFiles($parent_dir, $extension=null)
+    {
         // check on the parameters
-        if($parent_dir == null || trim($parent_dir) == false) {
-            throw new \InvalidArgumentException("the parent_dir parameter cannot be null");
+        if ($parent_dir == null || trim($parent_dir) == false) {
+            throw new \InvalidArgumentException(
+                'the $parent_dir argument cannot be null or an empty string'
+            );
         }
 
         // ensure path ends in slash
@@ -202,8 +205,8 @@ class Files
         }
 
         // check to make sure that the directory exists
-        if(file_exists($parent_dir) == false) {
-            throw new FileNotFoundException("unable to access the specified directory: '$parent_dir'");
+        if (file_exists($parent_dir) == false) {
+            throw new FileNotFoundException($parent_dir);
         }
 
         // store the length of the extension for later
@@ -217,14 +220,14 @@ class Files
         array_push($directories, $parent_dir);
 
         // loop through the list of directories
-        while(count($directories) > 0) {
+        while (count($directories) > 0) {
 
             // open a handle to the next directory
             $directory = array_shift($directories);
             $dir_handle = opendir($directory);
 
             // check to make sure we got a directory handle
-            if($dir_handle == false) {
+            if ($dir_handle == false) {
                 return null;
             }
 
@@ -235,18 +238,18 @@ class Files
                 $file = $directory . $file;
 
                 // skip the . and .. files
-                if($file == "$directory." || $file == "$directory..") {
+                if ($file == "$directory." || $file == "$directory..") {
                     continue;
                 }
 
                 // check to see if this is a file or directory
-                if(is_dir($file) == true) {
+                if (is_dir($file) == true) {
                     // this is a directory, add it to the list of directories
                     array_push($directories, $file . "/");
 
                 } else {
                     // check to see if this file matches the extension, if required
-                    if($extension != null) {
+                    if ($extension != null) {
                         if (substr($file, $ext_length) == $extension) {
                             // store the file
                             array_push($files, $file);
@@ -261,5 +264,62 @@ class Files
 
         // return the list of files
         return $files;
+    }
+
+    /**
+     * Filter a list of paths to only those that match list of extensions
+     *
+     * @param array $paths      the list of paths to process
+     * @param array $extensions the list of allowed extensions
+     *
+     * @return array the list of filtered paths
+     *
+     * @throws \InvalidArgumentException if the arguments do not pass validation
+     */
+    public static function filterPathsByExt($paths, $extensions)
+    {
+        // check the arguments
+        if (!is_array($paths)) {
+            throw new \InvalidArgumentException(
+                'The $paths argument must be an array'
+            );
+        }
+
+        if (!is_array($extensions)) {
+            throw new \InvalidArgumentException(
+                'The $extensions argument must be an array'
+            );
+        }
+
+        if (count($paths) == 0) {
+            throw new \InvalidArgumentException(
+                'The $paths argument must have at least one element'
+            );
+        }
+
+        if (count($extensions) == 0) {
+            throw new \InvalidArgumentException(
+                'The $extensions argument must have at least one element'
+            );
+        }
+
+        // filter the list of paths
+        $filtered = array();
+        $criteria = array();
+
+        foreach ($extensions as $extension) {
+            $criteria[$extension] = strlen($extension) * -1;
+        }
+
+        foreach ($paths as $path) {
+            foreach ($criteria as $extension => $length) {
+                if (substr($path, $length) == $extension) {
+                    $filtered[] = $path;
+                    continue 2; // skip to the end of the outer loop
+                }
+            }
+        }
+
+        return $filtered;
     }
 }
