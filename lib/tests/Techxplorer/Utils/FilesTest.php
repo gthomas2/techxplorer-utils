@@ -239,8 +239,8 @@ class FilesTests extends PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function testConvertSizeOne() {
-
+    public function testConvertSizeOne()
+    {
         // basic sizes in the denominations supported
         $this->assertEquals(1024, Files::convertSize('1KB'));
         $this->assertEquals(1048576, Files::convertSize('1MB'));
@@ -260,9 +260,11 @@ class FilesTests extends PHPUnit_Framework_TestCase
      * Test the convertSize function
      *
      * @expectedException InvalidArgumentException
+     *
+     * @return void
      */
-    public function testConvertSizeTwo() {
-        // empty string
+    public function testConvertSizeTwo()
+    {
         Files::convertSize('');
     }
 
@@ -270,9 +272,11 @@ class FilesTests extends PHPUnit_Framework_TestCase
      * Test the convertSize function
      *
      * @expectedException InvalidArgumentException
+     *
+     * @return void
      */
-    public function testConvertSizeThree() {
-        // invalid string
+    public function testConvertSizeThree()
+    {
         Files::convertSize('foo');
     }
 
@@ -280,9 +284,11 @@ class FilesTests extends PHPUnit_Framework_TestCase
      * Test the convertSize function
      *
      * @expectedException InvalidArgumentException
+     *
+     * @return void
      */
-    public function testConvertSizeFour() {
-        // unrecognised string
+    public function testConvertSizeFour()
+    {
         Files::convertSize('1TB');
     } 
 
@@ -301,57 +307,215 @@ class FilesTests extends PHPUnit_Framework_TestCase
      * Test the findFiles function when the parent directory isn't available
      *
      * @expectedException \Techxplorer\Utils\FileNotFoundException
+     *
+     * @return void
      */
-    public function test_findFiles_parent_not_found() {
-       // test the case where the path cannot be read
-       Files::findFiles('../directory-not-here/');
+    public function testFindFiles()
+    {
+        // test the case where the path cannot be read
+        Files::findFiles('../directory-not-here/');
     }
 
     /**
      * Test the findFiles function without a filter
+     *
+     * @return void
      */
-    public function test_findFiles_no_filter() {
+    public function testfindFilesTwo()
+    {
         global $CFG;
-        //debug code
-        //var_dump(Files::find_files('./data'));
 
         // test that the file list matches what is expected with no filter
-        $this->assertCount(self::DEFAULT_FILE_COUNT, Files::findFiles($CFG->data_root)); // with missing tail slash
-        $this->assertCount(self::DEFAULT_FILE_COUNT, Files::findFiles($CFG->data_root . '/')); // with included tail slash
+        $this->assertCount(
+            self::DEFAULT_FILE_COUNT,
+            Files::findFiles($CFG->data_root)
+        );
+        $this->assertCount(
+            self::DEFAULT_FILE_COUNT,
+            Files::findFiles($CFG->data_root . '/')
+        );
     }
 
     /**
      * Test the findFiles function with a filter
+     *
+     * @return void
      */
-    public function test_findFiles_with_filter() {
+    public function testFindFilesThree()
+    {
         global $CFG;
 
         // test that the file list matches what is expected with a filter
-        $this->assertCount(self::DEFAULT_FILTER_FILE_COUNT, Files::findFiles($CFG->data_root, '.json')); // with missing tail slash
-        $this->assertCount(self::DEFAULT_FILTER_FILE_COUNT, Files::findFiles($CFG->data_root . '/', '.json')); // with included tail slash
-     }
+        $this->assertCount(
+            self::DEFAULT_FILTER_FILE_COUNT,
+            Files::findFiles($CFG->data_root, '.json')
+        );
+        $this->assertCount(
+            self::DEFAULT_FILTER_FILE_COUNT,
+            Files::findFiles($CFG->data_root . '/', '.json')
+        );
+    }
 
     /**
      * Test the parameter checking code of the findFiles function
+     *
      * @expectedException InvalidArgumentException
+     *
+     * @return void
      */
-    public function test_findFiles_exception_one() {
+    public function testFindFilesFour()
+    {
         Files::findFiles(null);
     }
 
     /**
      * Test the parameter checking code of the findFiles function
+     *
      * @expectedException InvalidArgumentException
+     *
+     * @return void
      */
-    public function test_findFiles_exception_two() {
+    public function testFindFilesFive()
+    {
         Files::findFiles(null, '.md');
     }
 
     /**
      * Test the parameter checking code of the findFiles function
+     *
      * @expectedException InvalidArgumentException
+     *
+     * @return void
      */
-     public function test_findFiles_exception_three() {
+    public function testFindFilesSix()
+    {
          Files::findFiles('', '.md');
-     }
+    }
+
+    /**
+     * Test the filterPathsByExt function
+     *
+     * @return void
+     */
+    public function testFilterPathsByExt()
+    {
+        $paths = array(
+            '/path/to/a/php/file.php',
+            '/path/to/a/css/file.css',
+            'path/to/a/javascript/file.js',
+            '/path/to/a/bin/file.bin',
+        );
+
+        $expected = array(
+            '/path/to/a/php/file.php',
+            '/path/to/a/css/file.css',
+            'path/to/a/javascript/file.js',
+        );
+
+        $exts = array('php', 'css', 'js');
+
+        $this->assertEquals($expected, Files::filterPathsByExt($paths, $exts));
+
+        $expected = array(
+            '/path/to/a/php/file.php',
+            '/path/to/a/css/file.css',
+        );
+
+        $exts = array('php', 'css');
+
+        $this->assertEquals($expected, Files::filterPathsByExt($paths, $exts));
+
+        $expected = array(
+            '/path/to/a/php/file.php',
+        );
+
+        $exts = array('php');
+
+        $this->assertEquals($expected, Files::filterPathsByExt($paths, $exts));
+
+        $paths[] = '/another/path/to/a/php-file.php';
+
+        $expected = array(
+            '/path/to/a/php/file.php',
+            '/another/path/to/a/php-file.php'
+        );
+
+        $exts = array('php');
+
+        $this->assertEquals($expected, Files::filterPathsByExt($paths, $exts));
+    }
+
+    /**
+     * Test the filterPathsByExt function
+     *
+     * @expectedException \InvalidArgumentException
+     *
+     * @return void
+     */
+    public function testFilterPathsByExtTwo()
+    {
+        Files::filterPathsByExt('123', '456');
+    }
+
+    /**
+     * Test the filterPathsByExt function
+     *
+     * @expectedException \InvalidArgumentException
+     *
+     * @return void
+     */
+    public function testFilterPathsByExtThree()
+    {
+        Files::filterPathsByExt(array(), '456');
+    }
+
+    /**
+     * Test the filterPathsByExt function
+     *
+     * @expectedException \InvalidArgumentException
+     *
+     * @return void
+     */
+    public function testFilterPathsByExtFour()
+    {
+        Files::filterPathsByExt(array(), array());
+    }
+
+    /**
+     * Test the filterPathsByExt function
+     *
+     * @expectedException \InvalidArgumentException
+     *
+     * @return void
+     */
+    public function testFilterPathsByExtFive()
+    {
+        $paths = array(
+            '/path/to/a/php/file.php',
+            '/path/to/a/css/file.css',
+            'path/to/a/javascript/file.js',
+            '/path/to/a/bin/file.bin',
+        );
+
+        Files::filterPathsByExt($paths, array());
+    }
+
+    /**
+     * Test the filterPathsByExt function
+     *
+     * @expectedException \InvalidArgumentException
+     *
+     * @return void
+     */
+    public function testFilterPathsByExtSix()
+    {
+        $paths = array(
+            '/path/to/a/php/file.php',
+            '/path/to/a/css/file.css',
+            'path/to/a/javascript/file.js',
+            '/path/to/a/bin/file.bin',
+        );
+
+        Files::filterPathsByExt(array(), $paths);
+    }
 }
