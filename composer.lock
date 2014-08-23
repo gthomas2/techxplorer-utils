@@ -261,12 +261,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-cli/php-cli-tools.git",
-                "reference": "64f04319c680f16d6a69c782643a11ab6af3dcb3"
+                "reference": "4f09ec158422e6a5668afb30f91251e70a48e612"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-cli/php-cli-tools/zipball/64f04319c680f16d6a69c782643a11ab6af3dcb3",
-                "reference": "64f04319c680f16d6a69c782643a11ab6af3dcb3",
+                "url": "https://api.github.com/repos/wp-cli/php-cli-tools/zipball/4f09ec158422e6a5668afb30f91251e70a48e612",
+                "reference": "4f09ec158422e6a5668afb30f91251e70a48e612",
                 "shasum": ""
             },
             "require": {
@@ -303,7 +303,7 @@
                 "cli",
                 "console"
             ],
-            "time": "2014-08-04 21:19:08"
+            "time": "2014-08-10 19:55:19"
         },
         {
             "name": "yzalis/identicon",
