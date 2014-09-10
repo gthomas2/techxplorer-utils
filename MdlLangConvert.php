@@ -68,7 +68,7 @@ class MdlLangConvert
     /**
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.0';
+    const SCRIPT_VERSION = 'v1.0.1';
 
     /**
      * defines the uri for more information
@@ -368,6 +368,12 @@ class MdlLangConvert
                 \cli\out("Skipping customisation\n");
                 $skipped[] = $key;
             }
+        }
+
+        // check to see if updating the xml file is necessary
+        if (count($added) == 0) {
+            \cli\out("%gSUCCESS: %wNo customisations need to be converted\n");
+            die();
         }
 
         // update the xml file
