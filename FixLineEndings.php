@@ -63,7 +63,7 @@ class FixLineEndings
     /**
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.0';
+    const SCRIPT_VERSION = 'v1.0.1';
 
     /**
      * defines the uri for more information
@@ -119,6 +119,11 @@ class FixLineEndings
         $arguments->addFlag(
             array('verbose', 'v'),
             'Show verbose output'
+        );
+
+        $arguments->addFlag(
+            array('trim', 't'),
+            'Trim trailing whitespace'
         );
 
         // parse the arguments
@@ -181,6 +186,12 @@ class FixLineEndings
             $verbose = true;
         }
 
+        $trim = false;
+
+        if ($arguments['trim']) {
+            $trim = true;
+        }
+
         // determine the path to the dos2unix binary
         try {
             $dos2unix_path = Files::findApp('dos2unix');
@@ -193,10 +204,16 @@ class FixLineEndings
         \cli\out("Looking for files in:\n$input_path\n");
         \cli\out("Using this dos2unix:\n$dos2unix_path\n");
         \cli\out(
-            "Filtering for files with extension:\n" .
+            "Filtering for files with extension:\n    " .
             implode(',', $extensions) .
-            "\n\n"
+            "\n"
         );
+
+        if ($trim) {
+            \cli\out("Trimming trailing whitespace\n");
+        }
+
+        \cli\out("\n");
 
         // get a list of files to operate on
         $file_list = Files::findFiles($input_path);
@@ -215,12 +232,29 @@ class FixLineEndings
 
             if ($return_var != 0) {
                 \cli\out("%yWARNING: %wUnable to process:\n$file\n");
-            } else {
-                $fixed_list[] = $file;
+                continue;
+            }
 
-                if ($verbose) {
-                    \cli\out("Processed file:\n$file\n");
+            if ($trim) {
+                // trim trailing whitespace
+                $contents = file($file);
+                $trimmed = array();
+
+                foreach ($contents as $line) {
+                    $line = preg_replace('# +$|\t+$#', '', $line);
+                    $trimmed[] = $line;
                 }
+
+                if (file_put_contents($file, $trimmed) === false) {
+                    \cli\out("%yWARNING: %wUnable to trim whitspace from:\n$file\n");
+                    continue;
+                }
+            }
+
+            $fixed_list[] = $file;
+
+            if ($verbose) {
+                \cli\out("Processed file:\n$file\n");
             }
         }
 
