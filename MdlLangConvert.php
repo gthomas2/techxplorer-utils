@@ -68,7 +68,7 @@ class MdlLangConvert
     /**
      * defines the version of the script
      */
-    const SCRIPT_VERSION = 'v1.0.1';
+    const SCRIPT_VERSION = 'v1.0.2';
 
     /**
      * defines the uri for more information
@@ -419,6 +419,12 @@ class MdlLangConvert
         // adjust the node name if required
         if ($lang_data->getPluginType() == $lang_data::TYPE_CORE) {
             $node_name = 'core_' . $node_name;
+        } else if ($lang_data->getPluginType() == $lang_data::TYPE_MOD) {
+            $node_name = 'mod_' . $node_name;
+        }
+
+        if ($node_name == 'core_moodle') {
+            $node_name = 'core';
         }
 
         // build a list of new nodes
