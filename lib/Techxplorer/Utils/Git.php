@@ -396,7 +396,7 @@ class Git
             // return merge commits?
             if ($tmp[0] == 'Merge' && $skip_merges && !$include_hashes) {
                 continue;
-            } else if ($tmp[1] == 'Merge' && $skip_merges && $include_hashes) {
+            } else if (!empty($tmp[1]) && $tmp[1] == 'Merge' && $skip_merges && $include_hashes) {
                 continue;
             }
 
