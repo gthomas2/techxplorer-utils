@@ -20,50 +20,36 @@
  * @copyright techxplorer 2015
  * @license GPL-3.0+
  * @see https://github.com/techxplorer/techxplorer-utils
- * @version 2.0
+ * @version 1.0
  */
 
-namespace Techxplorer\Utils;
+namespace Techxplorer;
+
+use \Techxplorer\Utils\System;
+use \PHPUnit_Framework_TestCase;
 
 /**
- * A utility class of system related functions
- *
- * @package Techxplorer
+ * Test the abstract application class
  */
-class System
+class TestSystem extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Determine if the operating system is Mac OS X
+     * Test the isMacOSX function
      *
-     * @return bool true if the OS is Mac OS X
+     * @return void
      */
-    public static function isMacOSX()
+    public function testIsMacOSX()
     {
-        // Get the constant with consistent case
-        $os = strtoupper(PHP_OS);
-
-        // Check to see if it matches what we expect for Mac OS X
-        if ($os == 'DARWIN') {
-            return true;
-        } else {
-            return false;
-        }
+        $this->assertTrue(System::isMacOSX());
     }
 
     /**
-     * Determine if the script is running on the CLI
+     * Test the isOnCLI function
      *
-     * @return boolean true if on CLI, false if it isn't
+     * @return void
      */
-    public static function isOnCLI()
+    public function testIsOnCLI()
     {
-        // Get the server api with consistent case
-        $sapi = strtoupper(php_sapi_name());
-
-        if (substr($sapi, 0, 3) == 'CLI') {
-            return true;
-        } else {
-            return false;
-        }
+        $this->assertTrue(System::isOnCLI());
     }
 }

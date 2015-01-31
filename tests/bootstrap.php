@@ -20,28 +20,12 @@
  * @copyright techxplorer 2015
  * @license GPL-3.0+
  * @see https://github.com/techxplorer/techxplorer-utils
- * @version 2.0
+ * @version 1.0
  */
 
-namespace Techxplorer\Utils;
+require_once(__DIR__ . '/../vendor/autoload.php');
 
-/**
- * An Exception class thrown when a file is not found
- */
-class FileNotFoundException extends \RuntimeException
-{
-    /**
-     * Constructor
-     *
-     * @param string $path The path to the file that was not found
-     */
-    public function __construct($path)
-    {
-        parent::__construct(
-            sprintf(
-                'The file "%s" does not exist',
-                $path
-            )
-        );
-    }
-}
+// store common config options
+global $CFG;
+$CFG = new stdClass();
+$CFG->data_root = realpath(__DIR__ . '/data/') . '/';

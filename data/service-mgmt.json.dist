@@ -1,5 +1,0 @@
-{
-    "Memcached" : "homebrew.mxcl.memcached.plist",
-    "PHP-FPM"   : "homebrew.mxcl.php55.plist",
-    "nginx"     : "homebrew.mxcl.nginx.plist"
-}
