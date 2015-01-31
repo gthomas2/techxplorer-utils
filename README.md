@@ -22,7 +22,7 @@ Documentation on the available scripts is contained in [the wiki](https://github
 These scripts use the following libraries, installed and managed using [Composer](https://getcomposer.org/).
 
 1. [wp-cli/php-cli-tools](https://github.com/wp-cli/php-cli-tools)
-2  [noodlehaus/config](https://github.com/noodlehaus/config)
+2. [noodlehaus/config](https://github.com/noodlehaus/config)
 3. [hackzilla/password-generator](https://github.com/hackzilla/password-generator)
 4. [cpliakas/git-wrapper](https://github.com/cpliakas/git-wrapper)
 
