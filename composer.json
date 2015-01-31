@@ -2,7 +2,8 @@
     "require": {
         "wp-cli/php-cli-tools": "dev-master",
         "noodlehaus/config": "dev-master",
-        "hackzilla/password-generator": "~1.0"
+        "hackzilla/password-generator": "dev-master",
+        "cpliakas/git-wrapper": "dev-master"
     },
     "autoload": {
         "psr-0": {

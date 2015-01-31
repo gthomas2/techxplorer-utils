@@ -134,9 +134,9 @@ abstract class Application
         if (empty($this->options[$option])) {
             if (empty($default)) {
                 $this->printError("Missing required option --{$option}");
-                die(-1);
+                exit(1);
             } else {
-                $this->printWarning("Missing option --{$option} using the default value '{$default}'");
+                $this->printWarning("Missing option --{$option} using the default value:\n  {$default}");
                 $this->options[$option] = $default;
             }
         }
