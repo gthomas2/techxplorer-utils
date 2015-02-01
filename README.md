@@ -25,6 +25,7 @@ These scripts use the following libraries, installed and managed using [Composer
 2. [noodlehaus/config](https://github.com/noodlehaus/config)
 3. [hackzilla/password-generator](https://github.com/hackzilla/password-generator)
 4. [cpliakas/git-wrapper](https://github.com/cpliakas/git-wrapper)
+5. [chobie/jira-api-restclient](https://github.com/chobie/jira-api-restclient)
 
 My thanks to the authors of, and contributors to, these libraries. My own development would not have been possible without them.
 
