@@ -3,7 +3,8 @@
         "wp-cli/php-cli-tools": "dev-master",
         "noodlehaus/config": "dev-master",
         "hackzilla/password-generator": "dev-master",
-        "cpliakas/git-wrapper": "dev-master"
+        "cpliakas/git-wrapper": "dev-master",
+        "chobie/jira-api-restclient": "dev-master"
     },
     "autoload": {
         "psr-0": {

@@ -29,6 +29,7 @@ namespace Techxplorer\Utils;
  * A utility class of system related functions
  *
  * @package Techxplorer
+ * @subpackage Utils
  */
 class System
 {
@@ -39,10 +40,8 @@ class System
      */
     public static function isMacOSX()
     {
-        // Get the constant with consistent case
         $os = strtoupper(PHP_OS);
 
-        // Check to see if it matches what we expect for Mac OS X
         if ($os == 'DARWIN') {
             return true;
         } else {
@@ -57,7 +56,6 @@ class System
      */
     public static function isOnCLI()
     {
-        // Get the server api with consistent case
         $sapi = strtoupper(php_sapi_name());
 
         if (substr($sapi, 0, 3) == 'CLI') {
@@ -65,5 +63,32 @@ class System
         } else {
             return false;
         }
+    }
+
+    /**
+     * Determine the path to an application
+     *
+     * @return string $name the name of the application
+     *
+     * @return mixed string|bool the full path to the application, or false on failure
+     *
+     * @throws InvalidArgumentException if one of the arguments is invalid
+     */
+    public static function findApp($name)
+    {
+        $name = trim($name);
+
+        if (empty(trim($name))) {
+            throw new \InvalidArgumentException('The $name argument is required');
+        }
+
+        $cmd = escapeshellcmd("which $name");
+        $path = trim(shell_exec($cmd));
+
+        if (empty($path)) {
+            return false;
+        }
+
+        return $path;
     }
 }

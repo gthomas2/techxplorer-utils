@@ -25,56 +25,49 @@
 
 namespace Techxplorer;
 
-use \Techxplorer\Utils\System;
+use \Techxplorer\Utils\Pasteboard;
+
 use \PHPUnit_Framework_TestCase;
 
 /**
- * Test the System class
+ * Test the abstract Pasteboard class
  */
-class TestSystem extends \PHPUnit_Framework_TestCase
+class TestPasteboard extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Test the isMacOSX function
+     * Test the Pasteboard class
      *
-     * @return void
+     * @return var
      */
-    public function testIsMacOSX()
+    public function testPasteboard()
     {
-        $this->assertTrue(System::isMacOSX());
+        $pasteboard = new Pasteboard();
+
+        $data = 'The return we reap from generous actions is not always evident. - Francesco Guicciardini';
+
+        $this->assertTrue($pasteboard->copy($data));
+        $this->assertEquals($data, $pasteboard->paste());
+
+        $data = <<<'EOD'
+If you feel lost, disappointed, hesitant, or weak, return to yourself,
+to who you are, here and now and when you get there, you will discover yourself,
+like a lotus flower in full bloom, even in a muddy pond, beautiful and strong.
+-  Masaru Emoto
+EOD;
+
+        $this->assertTrue($pasteboard->copy($data));
+        $this->assertEquals($data, $pasteboard->paste());
     }
 
     /**
-     * Test the isOnCLI function
-     *
-     * @return void
-     */
-    public function testIsOnCLI()
-    {
-        $this->assertTrue(System::isOnCLI());
-    }
-
-    /**
-     * Test the findApp function
-     *
-     * @return void
-     */
-    public function testFindApp()
-    {
-        $expected = '/bin/cat';
-
-        $this->assertEquals($expected, System::findApp('cat'));
-        $this->assertEquals($expected, System::findApp('cat '));
-        $this->assertFalse(System::findApp('nothere'));
-    }
-
-    /**
-     * Testt the findAdd function
+     * Test the copy function
      *
      * @return void
      * @expectedException \InvalidArgumentException
      */
-    public function testfindAppZero()
+    public function testPasteboardZero()
     {
-        System::findApp(' ');
+        $pasteboard = new Pasteboard();
+        $pasteboard->copy('   ');
     }
 }

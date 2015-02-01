@@ -43,12 +43,13 @@ class DbAssistApp extends Application
     /** @var $application_version the version of the application */
     protected static $application_version = "2.0.0";
 
+    /** @var $configpath the path to where the config files are stored */
     protected $configpath;
 
     /**
      * Constructor for the class
      *
-     * @param string $configpath
+     * @param string $configpath the path to where the config files are stored
      *
      * @return void
      */

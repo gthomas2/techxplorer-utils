@@ -25,6 +25,7 @@
 
 namespace Techxplorer\Apps;
 
+use \Techxplorer\Utils\Pasteboard;
 use GitWrapper\GitWrapper;
 use GitWrapper\GitBranches;
 
@@ -34,19 +35,23 @@ use GitWrapper\GitBranches;
  * @package    Techxplorer
  * @subpackage Apps
  */
-class GitFetchReset extends Application
+class GitMergeContents extends Application
 {
     /** @var $application_name the name of the application */
-    protected static $application_name = "Techxplorer's Git Fetch and Reset Script";
+    protected static $application_name = "Techxplorer's Git Merge Contents Script";
 
     /** @var $application_version the version of the application */
     protected static $application_version = "2.0.0";
+
+    /** @var $pasteboard used to copy the list of commits to the pastboard */
+    protected $pasteboard;
 
     /**
      * Construct a new GitFetchReset object
      */
     public function __construct()
     {
+        $this->pasteboard = new Pasteboard();
         parent::__construct();
     }
 
@@ -64,43 +69,68 @@ class GitFetchReset extends Application
         $this->parseOptions();
         $this->printHelpScreen();
         $this->validateOption('repository', getcwd());
+        $this->validateOption('commit');
+
+        $this->printInfo("Searching for commit: {$this->options['commit']}");
 
         // Get a GitWrapper object and associated with the repository path.
         $wrapper = new GitWrapper();
         $git = $wrapper->workingCopy($this->options['repository']);
 
-        // Fetch the latest changes.
+        // Get the list of commits contained in the merge commit.
         try {
-            $this->printInfo('Fetching latest changes...');
-            $git->fetch('origin');
+            $log = $wrapper->git("log --oneline {$this->options['commit']}^...{$this->options['commit']}");
         } catch (\GitWrapper\GitException $e) {
             $msg = trim($e->getMessage(), 'fatal: ');
             $this->printError("A fatal error occurred:\n  $msg");
             exit(1);
         }
 
-        $branches = new GitBranches($git);
-        $this->printInfo("Reseting the current branch: {$branches->head()}");
+        $log_entries = explode("\n", $log);
+        $commits = array();
 
-        // Reset the branch.
-        try {
-            $this->printInfo('Reseting the branch...');
-            $wrapper->git('reset --hard origin/' . $branches->head());
-        } catch (\GitWrapper\GitException $e) {
-            $this->printError('Unable to reset branch changes.');
-            exit(1);
+        // Build the list of commits.
+        foreach ($log_entries as $entry) {
+            $entry = trim($entry);
+            if (empty($entry)) {
+                continue;
+            }
+
+            $tmp = explode(' ', $entry);
+
+            if ($tmp[0] == $this->options['commit']) {
+                continue;
+            }
+
+            array_shift($tmp);
+
+            if ($tmp[0] == 'Merge' || (!empty($tmp[1]) && $tmp[1] == 'Merge')) {
+                continue;
+            }
+
+            $commits[] = implode(' ', $tmp);
         }
 
-        // Cleaning the branch.
-        try {
-            $this->printInfo('Cleaning the branch...');
-            $git->clean('-d', '-f');
-        } catch (\GitWrapper\GitException $e) {
-            $this->printError('Unable to clean the branch.');
-            exit(1);
+        if (count($commits) == 0) {
+            $this->printWarning(
+                "No commits found.\n" .
+                "  Was {$this->options['commit']} a merge commit?"
+            );
         }
 
-        $this->printSuccess('Latest changes fetched, and branch reset.');
+        $commits = array_unique($commits);
+
+        \cli\out("\nIncludes: \n");
+        $tree = new \cli\Tree;
+        $tree->setData($commits);
+        $renderer = new \cli\tree\Markdown(2);
+        $tree->setRenderer($renderer);
+        $tree->display();
+
+        $data = "Includes: \n" . $renderer->render($commits);
+        if (!$this->pasteboard->copy($data)) {
+            $this->printWarning('Unable to copy list of items to the pasteboard.');
+        }
     }
 
     /**
@@ -118,6 +148,14 @@ class GitFetchReset extends Application
             array(
                 'default' => 'The current working directory',
                 'description' => 'The path to the git repository'
+            )
+        );
+
+        $this->options->addOption(
+            array('commit', 'c'),
+            array(
+                'default' => '',
+                'description' => 'The hash of the merge commit of interestn'
             )
         );
 

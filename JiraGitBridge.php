@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /**
  * This file is part of Techxplorer's Utility Scripts.
@@ -23,28 +24,16 @@
  * @version 2.0
  */
 
-namespace Techxplorer\Utils;
+namespace Techxplorer;
 
-/**
- * An Exception class thrown when a file is not found
- *
- * @package Techxplorer
- * @subpackage Utils
- */
-class FileNotFoundException extends \RuntimeException
-{
-    /**
-     * Constructor
-     *
-     * @param string $path The path to the file that was not found
-     */
-    public function __construct($path)
-    {
-        parent::__construct(
-            sprintf(
-                'The file "%s" does not exist',
-                $path
-            )
-        );
-    }
+use \Techxplorer\Utils\System;
+use \Techxplorer\Apps\JiraGitBridge;
+
+require_once(__DIR__ . '/vendor/autoload.php');
+
+if (System::isOnCLI()) {
+    $application = new JiraGitBridge(realpath(__DIR__) . '/data');
+    $application->doTask();
+} else {
+    die('This application can only be run on the CLI');
 }
