@@ -34,13 +34,13 @@ use GitWrapper\GitBranches;
  * @package    Techxplorer
  * @subpackage Apps
  */
-class GitFetchReset extends Application
+class GerritPush extends Application
 {
     /** @var $application_name the name of the application */
     protected static $application_name = "Techxplorer's Push to Gerrit Script";
 
     /** @var $application_version the version of the application */
-    protected static $application_version = "2.0.0";
+    protected static $application_version = "2.0.1";
 
     /**
      * Construct a new GerritPush object
@@ -70,9 +70,12 @@ class GitFetchReset extends Application
         $git = $wrapper->workingCopy($this->options['repository']);
         $branches = new GitBranches($git);
 
-        // Check he status of the repository
+        // Increase the timeout for git operations in seconds.
+        $wrapper->setTimeout(120);
+
+        // Check he status of the repository.
         try {
-            if (!empty($git->status())) {
+            if (!empty((string) $git->status(array('s' => true)))) {
                 $this->printError('The repository has untracked changes.');
                 exit(1);
             }
@@ -81,13 +84,14 @@ class GitFetchReset extends Application
             exit(1);
         }
 
-        // Push the changes to Gerrit
+        // Push the changes to Gerrit.
         try {
             $this->printInfo('Pushing the changes to Gerrit...');
             $output = $wrapper->git('push origin HEAD:refs/for/' . $branches->head());
-            \cli\out($output . "\n");
+            \cli\out((string)$output . "\n");
         } catch (\GitWrapper\GitException $e) {
-            $this->printError('Unable to push the changes.');
+            $this->printError("Unable to push the changes.\n    " . $e->getMessage());
+
             exit(1);
         }
 
