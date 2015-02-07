@@ -40,7 +40,7 @@ class GitFetchReset extends Application
     protected static $application_name = "Techxplorer's Git Fetch and Reset Script";
 
     /** @var $application_version the version of the application */
-    protected static $application_version = "2.0.0";
+    protected static $application_version = "2.0.1";
 
     /**
      * Construct a new GitFetchReset object
@@ -69,6 +69,9 @@ class GitFetchReset extends Application
         $wrapper = new GitWrapper();
         $git = $wrapper->workingCopy($this->options['repository']);
 
+        // Increase the timeout for git operations in seconds.
+        $wrapper->setTimeout(120);
+
         // Fetch the latest changes.
         try {
             $this->printInfo('Fetching latest changes...');
@@ -79,13 +82,12 @@ class GitFetchReset extends Application
             exit(1);
         }
 
-        $branches = new GitBranches($git);
-        $this->printInfo("Reseting the current branch: {$branches->head()}");
-
         // Reset the branch.
         try {
-            $this->printInfo('Reseting the branch...');
-            $wrapper->git('reset --hard origin/' . $branches->head());
+            $branches = new GitBranches($git);
+            $branch = trim($branches->head());
+            $this->printInfo("Reseting the current branch: {$branch}...");
+            $wrapper->git('reset --hard origin/' . $branch);
         } catch (\GitWrapper\GitException $e) {
             $this->printError('Unable to reset branch changes.');
             exit(1);
